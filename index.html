@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manajemen Turnamen Berbasis Bagan</title>
+  <title>Manajemen Jadwal Turnamen</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
   <div class="container">
     <!-- Header Utama -->
     <header class="header-area">
-      <h1>🏆 Turnamen Berbasis Bagan</h1>
+      <h1>🏆 Manajemen Jadwal Turnamen</h1>
       <button id="admin-toggle-btn" class="btn-admin" onclick="toggleAdminLoginModal()">
         🔒 Login Admin
       </button>
@@ -37,23 +37,17 @@
       </div>
     </div>
 
-    <!-- Navigasi Tab Utama -->
+    <!-- Navigasi Tab Utama (Hanya Jadwal & Hasil) -->
     <nav class="tabs" role="tablist">
-      <button class="tab-btn active" role="tab" onclick="openTab(event, 'bagan')">🌳 Bagan Turnamen</button>
-      <button class="tab-btn" role="tab" onclick="openTab(event, 'jadwal')">📅 Jadwal & Skor</button>
+      <button class="tab-btn active" role="tab" onclick="openTab(event, 'jadwal')">📅 Jadwal Pertandingan</button>
       <button class="tab-btn" role="tab" onclick="openTab(event, 'hasil')">🏁 Hasil Selesai</button>
       <button id="admin-tab-btn" class="tab-btn admin-tab" role="tab" onclick="openTab(event, 'admin-panel')" style="display: none;">🛠️ Panel Admin</button>
     </nav>
 
     <!-- Konten Tab -->
     <main class="content-area">
-      <!-- Tab Bagan (Menu Utama Penonton) -->
-      <section id="bagan" class="tab-content active" role="tabpanel">
-        <div id="bagan-container" class="bracket-view"></div>
-      </section>
-
       <!-- Tab Jadwal -->
-      <section id="jadwal" class="tab-content" role="tabpanel">
+      <section id="jadwal" class="tab-content active" role="tabpanel">
         <div id="jadwal-container" class="card-grid"></div>
       </section>
 
@@ -90,22 +84,26 @@
             </div>
           </div>
 
-          <!-- Langkah 2: Input Pertandingan ke Bracket -->
+          <!-- Langkah 2: Input Pertandingan ke Jadwal -->
           <div class="admin-card" style="margin-top: 20px;">
-            <h4>2️⃣ Input Pertandingan ke Bagan (Bracket)</h4>
+            <h4>2️⃣ Buat Jadwal Pertemuan Tim</h4>
             <div class="input-group">
-              <label>Nama Babak (Contoh: Semifinal, Perempat Final, Grup A):</label>
+              <label>Nama Babak / Laga (Contoh: Semifinal 1, Perempat Final):</label>
               <input type="text" id="match-round" placeholder="Contoh: Semifinal 1">
             </div>
             <div class="input-group">
               <label>Pilih Tim 1:</label>
-              <select id="match-team1"></select>
+              <select id="match-team1" onchange="updateTeamSelectOptions()"></select>
             </div>
             <div class="input-group">
               <label>Pilih Tim 2:</label>
-              <select id="match-team2"></select>
+              <select id="match-team2" onchange="updateTeamSelectOptions()"></select>
             </div>
-            <button type="button" class="btn-save" onclick="createBracketMatch()" style="width: 100%;">➕ Tambahkan ke Bagan</button>
+            <div class="input-group">
+              <label>Tanggal & Waktu:</label>
+              <input type="text" id="match-date" placeholder="Contoh: Sabtu, 10 Okt - 15:00">
+            </div>
+            <button type="button" class="btn-save" onclick="createBracketMatch()" style="width: 100%;">➕ Tambahkan ke Jadwal</button>
           </div>
         </div>
       </section>
