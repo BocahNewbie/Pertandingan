@@ -321,7 +321,7 @@ function renderTeamListAdmin() {
   const container = document.getElementById('team-list-admin');
   if (!container) return;
   if (teamsList.length === 0) {
-    container.innerHTML = '<p style="color:#888;">Belum ada tim terdaftar.</p>';
+    container.innerHTML = '<p style="color:var(--text-muted);">Belum ada tim terdaftar.</p>';
     return;
   }
   
@@ -337,9 +337,9 @@ function renderTeamListAdmin() {
       <div class="team-chip">
         <div class="team-chip-header">
           <strong>${t.name}</strong>
-          <div>
-            <button class="btn-outline" style="padding:4px 8px;" onclick="openEditTeamModal(${i})">✏️</button>
-            <button class="btn-danger" style="padding:4px 8px;" onclick="removeTeam(${i})">&times;</button>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-outline" style="padding:4px 10px; font-size:0.8rem;" onclick="openEditTeamModal(${i})">✏️</button>
+            <button class="btn-danger" style="padding:4px 10px; font-size:0.8rem;" onclick="removeTeam(${i})">&times;</button>
           </div>
         </div>
         <div class="team-players">Pemain: ${pStr}</div>
@@ -422,7 +422,7 @@ function renderAdminMatchList() {
   const container = document.getElementById('admin-match-list-container');
   if (!container) return;
   if (matchesList.length === 0) {
-    container.innerHTML = '<p style="color:#888;">Belum ada pertandingan dibuat.</p>';
+    container.innerHTML = '<p style="color:var(--text-muted);">Belum ada pertandingan dibuat.</p>';
     return;
   }
 
@@ -433,10 +433,10 @@ function renderAdminMatchList() {
         <div class="teams-row" style="font-size: 1.1rem; margin-bottom: 5px;">
           <span>${m.tim1}</span> <span class="vs">VS</span> <span>${m.tim2}</span>
         </div>
-        <p style="font-size:0.85rem; color:#7f8c8d; font-weight:bold; margin-bottom: 10px;">Babak: ${m.round}</p>
+        <p style="font-size:0.85rem; color:var(--text-muted); font-weight:600; margin-bottom: 12px;">Babak: ${m.round}</p>
         
-        <!-- Info Waktu Sebelumnya untuk Perbandingan -->
-        <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 12px; border-left: 3px solid #3498db;">
+        <!-- Kotak History / Riwayat Waktu Sebelumnya yang Kontras & Jelas -->
+        <div class="match-history-box">
           🕒 <strong>Jadwal Saat Ini:</strong> ${m.tanggal}
         </div>
         
@@ -451,7 +451,7 @@ function renderAdminMatchList() {
               <input type="time" id="time_${m.id}" value="${m.rawTime || ''}">
             </div>
           </div>
-          <div class="grid-2" style="margin-top: 10px;">
+          <div class="grid-2" style="margin-top: 12px;">
             <div>
               <label style="font-size:0.8rem; font-weight:600;">Status:</label>
               <select id="status_${m.id}">
@@ -471,8 +471,8 @@ function renderAdminMatchList() {
                </div>
             </div>
           </div>
-          <div style="display:flex; gap:10px; margin-top: 15px;">
-            <button class="btn-save" style="flex:1;" onclick="saveMatchCard('${m.id}')">💾 Simpan Jadwal & Skor</button>
+          <div style="display:flex; gap:10px; margin-top: 16px;">
+            <button class="btn-save" style="flex:1;" onclick="saveMatchCard('${m.id}')">💾 Simpan Perubahan</button>
             <button class="btn-danger" onclick="deleteMatch('${m.id}')">🗑️ Hapus</button>
           </div>
         </div>
@@ -514,7 +514,7 @@ function deleteMatch(id) {
   });
 }
 
-// Render UI Publik: Urutkan tanggal terlebih dahulu, jika sama baru urutkan jam
+// Render UI Publik: Prioritas Tanggal Terlebih Dahulu, Lalu Jam
 function renderPublicUI() {
   const jContainer = document.getElementById('jadwal-container');
   const hContainer = document.getElementById('hasil-container');
@@ -530,7 +530,6 @@ function renderPublicUI() {
     if (hasDateA && !hasDateB) return -1;
     if (!hasDateA && !hasDateB) return 0;
 
-    // 1. Bandingkan Tanggal Terlebih Dahulu (Paling awal ke mendatang)
     let dateA = new Date(a.rawDate);
     let dateB = new Date(b.rawDate);
 
@@ -538,7 +537,6 @@ function renderPublicUI() {
       return dateA - dateB;
     }
 
-    // 2. Jika Tanggal Sama Persis, Bandingkan Jam-nya
     let timeA = a.rawTime && a.rawTime.trim() !== '' ? a.rawTime : '00:00';
     let timeB = b.rawTime && b.rawTime.trim() !== '' ? b.rawTime : '00:00';
 
@@ -550,13 +548,14 @@ function renderPublicUI() {
     let cardHTML = `
       <div class="match-card">
         <span class="badge ${m.status.toLowerCase()}">${m.status}</span>
-        <p class="match-time">📅 ${m.tanggal} <br><span style="color:#bdc3c7; font-size:0.8rem;">Babak: ${m.round}</span></p>
+        <p class="match-time">📅 ${m.tanggal}</p>
+        <p class="match-round-text" style="margin-bottom: 10px;">Babak: ${m.round}</p>
         <div class="teams-row">
           <span>${m.tim1}</span>
           ${m.status === 'Selesai' ? `<span class="score">${m.skor1} -${m.skor2}</span>` : `<span class="vs">VS</span>`}
           <span>${m.tim2}</span>
         </div>
-        ${m.status === 'Live' ? `<div style="text-align:center; margin-top:12px; color:#e74c3c; font-weight:bold; font-size:1.1rem;">Skor Sementara: ${m.skor1} -${m.skor2}</div>` : ''}
+        ${m.status === 'Live' ? `<div style="text-align:center; margin-top:12px; color:var(--primary); font-weight:bold; font-size:1.1rem;">⚡ SEDANG BERLANGSUNG: ${m.skor1} -${m.skor2}</div>` : ''}
       </div>
     `;
 
@@ -564,8 +563,8 @@ function renderPublicUI() {
     else jHTML += cardHTML;
   });
 
-  jContainer.innerHTML = jHTML || '<p style="text-align:center; color:#888;">Belum ada jadwal aktif.</p>';
-  hContainer.innerHTML = hHTML || '<p style="text-align:center; color:#888;">Belum ada pertandingan selesai.</p>';
+  jContainer.innerHTML = jHTML || '<p style="text-align:center; color:var(--text-muted); padding:20px;">Belum ada jadwal aktif.</p>';
+  hContainer.innerHTML = hHTML || '<p style="text-align:center; color:var(--text-muted); padding:20px;">Belum ada pertandingan selesai.</p>';
 }
 
 function showCustomAlert(title, msg, type) {
