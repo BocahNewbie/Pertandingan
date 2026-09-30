@@ -1,4 +1,3 @@
-// GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxC-Ey8aA5lx8Aa8LohL9xwD-i_7ROd7B07-lgwEOXR1g40ftsdkwnwvBvW9oDA9oDd/exec';
 
 let teamsList = [];
@@ -6,7 +5,6 @@ let matchesList = [];
 let isAdminLoggedIn = JSON.parse(localStorage.getItem('admin_logged_in')) || false;
 let editingTeamIndex = -1;
 
-// Saat halaman dimuat, tarik data terbaru dari Google Sheets
 document.addEventListener('DOMContentLoaded', () => {
   fetchDataFromServer(() => {
     renderTeamListAdmin();
@@ -22,40 +20,34 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Fungsi Ambil Data dengan Cache Instan
+// Fungsi Ambil Data dengan Cache Instan (Anti Loading Lama)
 function fetchDataFromServer(callback) {
-  // 1. Cek apakah ada data cache lokal sebelumnya agar langsung tampil tanpa menunggu
   let cachedTeams = localStorage.getItem('cache_teams');
   let cachedMatches = localStorage.getItem('cache_matches');
   
   if (cachedTeams && cachedMatches) {
     teamsList = JSON.parse(cachedTeams);
     matchesList = JSON.parse(cachedMatches);
-    // Render langsung menggunakan data cache agar instan
     if (callback) callback();
   }
 
-  // 2. Tarik data terbaru dari Google Sheets di latar belakang
   fetch(SCRIPT_URL + '?action=getData')
     .then(res => res.json())
     .then(data => {
       teamsList = data.teams || [];
       matchesList = data.matches || [];
       
-      // Simpan ke cache lokal
       localStorage.setItem('cache_teams', JSON.stringify(teamsList));
       localStorage.setItem('cache_matches', JSON.stringify(matchesList));
 
-      // Update tampilan dengan data paling fresh dari server
       if (callback) callback();
     })
     .catch(err => {
       console.error("Gagal menyinkronkan dengan server:", err);
-      if (!cachedTeams && callback) callback(); // Jalankan callback walau offline jika cache kosong
+      if (!cachedTeams && callback) callback();
     });
 }
 
-// Fungsi Simpan Data ke Google Sheets
 function syncToServer(actionType, callback) {
   let payload = { action: actionType };
   if (actionType === 'saveTeams') payload.teams = teamsList;
@@ -63,7 +55,7 @@ function syncToServer(actionType, callback) {
 
   fetch(SCRIPT_URL, {
     method: 'POST',
-    mode: 'no-cors', // Menghindari isu CORS pada Google Apps Script
+    mode: 'no-cors',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload)
   }).then(() => {
@@ -74,9 +66,6 @@ function syncToServer(actionType, callback) {
   });
 }
 
-// ==========================================
-// KONTROL VIEW & AUTENTIKASI
-// ==========================================
 function updateAuthUI() {
   const btnLogin = document.getElementById('btn-login-trigger');
   if (!btnLogin) return;
@@ -125,7 +114,6 @@ function switchView(viewName) {
       publicDash.style.display = 'block';
       publicDash.classList.add('active');
     }
-    // Sinkronkan data terbaru sebelum ditampilkan ke publik
     fetchDataFromServer(() => renderPublicUI());
   }
 }
@@ -147,7 +135,6 @@ function switchAdminTab(evt, tabName) {
   if (targetTab) targetTab.classList.add('active');
   if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
   
-  // Ambil data terbaru setiap kali pindah tab admin
   fetchDataFromServer(() => {
     if (tabName === 'admin-tim') renderTeamListAdmin();
     if (tabName === 'admin-bagan') updateTeamSelectOptions();
@@ -155,9 +142,6 @@ function switchAdminTab(evt, tabName) {
   });
 }
 
-// ==========================================
-// MODAL LOGIN
-// ==========================================
 function openLoginModal() { 
   const userInput = document.getElementById('admin-user');
   const passInput = document.getElementById('admin-pass');
@@ -210,9 +194,6 @@ function logoutAdmin() {
   showCustomAlert("Sesi Berakhir", "Anda telah keluar dari Administrator.", "success");
 }
 
-// ==========================================
-// MANAJEMEN TIM
-// ==========================================
 function addPlayerInput() {
   const container = document.getElementById('player-inputs-container');
   if (!container) return;
@@ -368,9 +349,6 @@ function renderTeamListAdmin() {
   container.innerHTML = html;
 }
 
-// ==========================================
-// MANAJEMEN BAGAN & JADWAL
-// ==========================================
 function getScheduledTeams() {
   let scheduled = new Set();
   matchesList.forEach(m => { scheduled.add(m.tim1); scheduled.add(m.tim2); });
@@ -530,9 +508,7 @@ function deleteMatch(id) {
   });
 }
 
-// ==========================================
-// RENDER UI PUBLIK (Urut Kronologis Waktu Terdekat)
-// ==========================================
+// Render UI Publik dengan Urutan Waktu Kronologis Terdekat
 function renderPublicUI() {
   const jContainer = document.getElementById('jadwal-container');
   const hContainer = document.getElementById('hasil-container');
@@ -574,7 +550,6 @@ function renderPublicUI() {
   hContainer.innerHTML = hHTML || '<p style="text-align:center; color:#888;">Belum ada pertandingan selesai.</p>';
 }
 
-// Custom Alert Helper
 function showCustomAlert(title, msg, type) {
   let overlay = document.getElementById('custom-alert');
   let card = document.getElementById('alert-card-box');
