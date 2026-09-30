@@ -41,7 +41,18 @@ body {
   transition: 0.2s; 
 }
 
-.btn-admin:hover, .btn-save:hover, .btn-submit:hover { 
+.btn-danger {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.btn-admin:hover, .btn-save:hover, .btn-submit:hover, .btn-danger:hover { 
   opacity: 0.85; 
 }
 
@@ -75,6 +86,35 @@ body {
 
 .tab-content { display: none; }
 .tab-content.active { display: block; }
+
+/* Chip Tim Terdaftar */
+.team-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.team-chip {
+  background: #e8f4fd;
+  border: 1px solid #3498db;
+  color: #2980b9;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.team-chip button {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
 
 /* Styling Modal Popup Modern */
 .modal-overlay {
