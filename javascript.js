@@ -1,67 +1,107 @@
-// Konfigurasi Awal Turnamen (Kosong/Clean State untuk Input Baru)
-let tournamentType = localStorage.getItem('tournament_type') || '4'; // '4' untuk Semifinal+Final, '2' untuk Langsung Final
-
-let matchesData = JSON.parse(localStorage.getItem('turnamen_data')) || getDefaultMatches(tournamentType);
-
+// State Data Tersimpan
+let teamsList = JSON.parse(localStorage.getItem('turnamen_teams')) || ["Tim A", "Tim B", "Tim C", "Tim D"];
+let matchesData = JSON.parse(localStorage.getItem('turnamen_matches')) || getDefaultMatches();
 let isAdminLoggedIn = JSON.parse(localStorage.getItem('admin_logged_in')) || false;
 
-// Generate Default Matches Berdasarkan Format Turnamen
-function getDefaultMatches(type) {
-  if (type === '4') {
-    return {
-      SF1: { id: 'SF1', tim1: 'Masukkan Tim 1', tim2: 'Masukkan Tim 2', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
-      SF2: { id: 'SF2', tim1: 'Masukkan Tim 3', tim2: 'Masukkan Tim 4', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
-      F:   { id: 'F',   tim1: 'Pemenang SF1', tim2: 'Pemenang SF2', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 }
-    };
-  } else {
-    return {
-      F:   { id: 'F',   tim1: 'Masukkan Tim A', tim2: 'Masukkan Tim B', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 }
-    };
-  }
+// Format Default Struktur Pertandingan Berdasarkan Jumlah Tim
+function getDefaultMatches() {
+  return {
+    SF1: { id: 'SF1', round: 'Semifinal 1', tim1: teamsList[0] || 'Tim 1', tim2: teamsList[1] || 'Tim 2', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
+    SF2: { id: 'SF2', round: 'Semifinal 2', tim1: teamsList[2] || 'Tim 3', tim2: teamsList[3] || 'Tim 4', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
+    F:   { id: 'F',   round: 'Final', tim1: 'Pemenang SF1', tim2: 'Pemenang SF2', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 }
+  };
 }
 
-// Cek status saat halaman dimuat
+// Inisialisasi Saat Halaman Dimuat
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('tournament-type').value = tournamentType;
+  renderTeamListAdmin();
   updateMatchSelectOptions();
   updateNextPhaseAutomatically();
   renderUI();
   updateAdminUIState();
 });
 
-// Ubah Format Turnamen (4 Tim atau 2 Tim)
-function changeTournamentFormat() {
-  const newType = document.getElementById('tournament-type').value;
-  if (confirm("Mengubah format akan mereset data pertandingan saat ini. Lanjutkan?")) {
-    tournamentType = newType;
-    localStorage.setItem('tournament_type', tournamentType);
-    matchesData = getDefaultMatches(tournamentType);
-    localStorage.setItem('turnamen_data', JSON.stringify(matchesData));
-    
+// Tambah Tim Baru
+function addTeam() {
+  const input = document.getElementById('new-team-name');
+  const teamName = input.value.trim();
+  if (!teamName) {
+    showCustomAlert("Perhatian", "Nama tim tidak boleh kosong!", "error");
+    return;
+  }
+  if (teamsList.includes(teamName)) {
+    showCustomAlert("Perhatian", "Tim dengan nama tersebut sudah terdaftar!", "error");
+    return;
+  }
+
+  teamsList.push(teamName);
+  localStorage.setItem('turnamen_teams', JSON.stringify(teamsList));
+  input.value = '';
+  renderTeamListAdmin();
+  showCustomAlert("Berhasil", `Tim "${teamName}" berhasil ditambahkan.`, "success");
+}
+
+// Hapus Tim
+function removeTeam(index) {
+  const removed = teamsList.splice(index, 1);
+  localStorage.setItem('turnamen_teams', JSON.stringify(teamsList));
+  renderTeamListAdmin();
+  showCustomAlert("Tim Dihapus", `Tim "${removed}" telah dihapus.`, "success");
+}
+
+// Render Chip Tim di Panel Admin
+function renderTeamListAdmin() {
+  const container = document.getElementById('team-list-admin');
+  if (teamsList.length === 0) {
+    container.innerHTML = '<p style="font-size: 0.85rem; color: #888;">Belum ada tim terdaftar.</p>';
+    return;
+  }
+  let html = '';
+  teamsList.forEach((team, idx) => {
+    html += `
+      <div class="team-chip">
+        <span>${team}</span>
+        <button type="button" onclick="removeTeam(${idx})" title="Hapus Tim">&times;</button>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+// Generate / Reset Jadwal Otomatis Berdasarkan Tim Terdaftar
+function generateBracket() {
+  if (teamsList.length < 2) {
+    showCustomAlert("Perhatian", "Minimal harus ada 2 tim terdaftar untuk membuat jadwal!", "error");
+    return;
+  }
+
+  if (confirm("Generate ulang akan mereset jadwal dan skor pertandingan berdasarkan daftar tim saat ini. Lanjutkan?")) {
+    if (teamsList.length >= 4) {
+      matchesData = {
+        SF1: { id: 'SF1', round: 'Semifinal 1', tim1: teamsList[0], tim2: teamsList[1], tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
+        SF2: { id: 'SF2', round: 'Semifinal 2', tim1: teamsList[2], tim2: teamsList[3], tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
+        F:   { id: 'F',   round: 'Final', tim1: 'Pemenang SF1', tim2: 'Pemenang SF2', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 }
+      };
+    } else {
+      matchesData = {
+        F:   { id: 'F',   round: 'Final', tim1: teamsList[0], tim2: teamsList[1], tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 }
+      };
+    }
+
+    localStorage.setItem('turnamen_matches', JSON.stringify(matchesData));
     updateMatchSelectOptions();
-    updateNextPhaseAutomatically();
     renderUI();
-    showCustomAlert("Format Diubah", "Turnamen telah diatur ulang ke format baru.", "success");
-  } else {
-    document.getElementById('tournament-type').value = tournamentType;
+    showCustomAlert("Berhasil", "Jadwal dan bagan berhasil di-generate ulang!", "success");
   }
 }
 
-// Perbarui Opsi Dropdown Sesuai Format Turnamen
+// Perbarui Opsi Dropdown Sesuai Data Match Aktif
 function updateMatchSelectOptions() {
   const select = document.getElementById('match-select');
   select.innerHTML = '<option value="">-- Pilih Pertandingan --</option>';
-
-  if (tournamentType === '4') {
-    select.innerHTML += `
-      <option value="SF1">Semifinal 1</option>
-      <option value="SF2">Semifinal 2</option>
-      <option value="F">Final</option>
-    `;
-  } else {
-    select.innerHTML += `
-      <option value="F">Final</option>
-    `;
+  for (let key in matchesData) {
+    let m = matchesData[key];
+    select.innerHTML += `<option value="${key}">${m.round}: ${m.tim1} vs ${m.tim2}</option>`;
   }
 }
 
@@ -128,7 +168,7 @@ function closeCustomAlert() {
   document.getElementById('custom-alert').style.display = 'none';
 }
 
-// Proses Validasi Username & Password (Default: admin / 123456)
+// Proses Validasi Username & Password
 function processLogin() {
   const user = document.getElementById('admin-user').value.trim();
   const pass = document.getElementById('admin-pass').value.trim();
@@ -138,7 +178,7 @@ function processLogin() {
     localStorage.setItem('admin_logged_in', 'true');
     closeLoginModal();
     updateAdminUIState();
-    showCustomAlert("Berhasil Masuk!", "Selamat datang kembali, Administrator! Anda sekarang dapat memasukkan nama tim dan mengelola turnamen.", "success");
+    showCustomAlert("Berhasil Masuk!", "Selamat datang kembali, Administrator! Anda sekarang dapat mengelola tim dan jadwal pertandingan.", "success");
   } else {
     showCustomAlert("Gagal Masuk", "Username atau password yang Anda masukkan salah. Silakan coba lagi.", "error");
   }
@@ -185,41 +225,35 @@ function onMatchSelectChange() {
   if (!matchId) return;
 
   const match = matchesData[matchId];
-  document.getElementById('admin-tim1').value = match.tim1;
-  document.getElementById('admin-tim2').value = match.tim2;
   document.getElementById('admin-tanggal').value = match.tanggal;
   document.getElementById('admin-status').value = match.status;
   document.getElementById('admin-skor1').value = match.skor1;
   document.getElementById('admin-skor2').value = match.skor2;
   
+  // Ubah label skor agar sesuai nama tim yang bertanding
+  document.getElementById('label-skor1').innerText = `Skor (${match.tim1}):`;
+  document.getElementById('label-skor2').innerText = `Skor (${match.tim2}):`;
+  
   toggleScoreInput();
 }
 
-// Otomatis Menentukan Pemenang Fase Berikutnya (Misal SF ke Final)
+// Otomatis Menentukan Pemenang Fase Berikutnya (Semifinal ke Final)
 function updateNextPhaseAutomatically() {
-  if (tournamentType === '4') {
+  if (matchesData.SF1 && matchesData.SF2 && matchesData.F) {
     let sf1 = matchesData.SF1;
     let sf2 = matchesData.SF2;
     let finalMatch = matchesData.F;
 
-    if (sf1 && sf1.status === 'Selesai') {
-      if (sf1.skor1 > sf1.skor2) {
-        finalMatch.tim1 = sf1.tim1;
-      } else if (sf1.skor2 > sf1.skor1) {
-        finalMatch.tim1 = sf1.tim2;
-      } else {
-        finalMatch.tim1 = `Pemenang SF1`;
-      }
+    if (sf1.status === 'Selesai') {
+      if (sf1.skor1 > sf1.skor2) finalMatch.tim1 = sf1.tim1;
+      else if (sf1.skor2 > sf1.skor1) finalMatch.tim1 = sf1.tim2;
+      else finalMatch.tim1 = 'Pemenang SF1';
     }
 
-    if (sf2 && sf2.status === 'Selesai') {
-      if (sf2.skor1 > sf2.skor2) {
-        finalMatch.tim2 = sf2.tim1;
-      } else if (sf2.skor2 > sf2.skor1) {
-        finalMatch.tim2 = sf2.tim2;
-      } else {
-        finalMatch.tim2 = `Pemenang SF2`;
-      }
+    if (sf2.status === 'Selesai') {
+      if (sf2.skor1 > sf2.skor2) finalMatch.tim2 = sf2.tim1;
+      else if (sf2.skor2 > sf2.skor1) finalMatch.tim2 = sf2.tim2;
+      else finalMatch.tim2 = 'Pemenang SF2';
     }
   }
 }
@@ -232,20 +266,17 @@ function saveMatchData() {
     return;
   }
 
-  matchesData[matchId] = {
-    id: matchId,
-    tim1: document.getElementById('admin-tim1').value || 'Tim X',
-    tim2: document.getElementById('admin-tim2').value || 'Tim Y',
-    tanggal: document.getElementById('admin-tanggal').value || 'Segera',
-    status: document.getElementById('admin-status').value,
-    skor1: parseInt(document.getElementById('admin-skor1').value) || 0,
-    skor2: parseInt(document.getElementById('admin-skor2').value) || 0
-  };
+  let match = matchesData[matchId];
+  match.tanggal = document.getElementById('admin-tanggal').value || 'Segera';
+  match.status = document.getElementById('admin-status').value;
+  match.skor1 = parseInt(document.getElementById('admin-skor1').value) || 0;
+  match.skor2 = parseInt(document.getElementById('admin-skor2').value) || 0;
 
   updateNextPhaseAutomatically();
 
-  localStorage.setItem('turnamen_data', JSON.stringify(matchesData));
-  showCustomAlert("Berhasil Disimpan!", "Data pertandingan dan bagan telah diperbarui.", "success");
+  localStorage.setItem('turnamen_matches', JSON.stringify(matchesData));
+  updateMatchSelectOptions();
+  showCustomAlert("Berhasil Disimpan!", "Jadwal dan skor pertandingan berhasil diperbarui.", "success");
   renderUI();
 }
 
@@ -268,7 +299,7 @@ function renderUI() {
       jadwalHTML += `
         <div class="match-card">
           <span class="badge ${m.status.toLowerCase()}">${m.status}</span>
-          <p class="match-time">📅 ${m.tanggal}</p>
+          <p class="match-time">📅 ${m.tanggal} (${m.round})</p>
           <div class="teams-row">
             <span class="team-name">${m.tim1}</span>
             <span class="vs">VS</span>
@@ -284,7 +315,7 @@ function renderUI() {
       hasilHTML += `
         <div class="match-card">
           <span class="badge selesai">Selesai</span>
-          <p class="match-time">📅 ${m.tanggal}</p>
+          <p class="match-time">📅 ${m.tanggal} (${m.round})</p>
           <div class="teams-row">
             <span class="team-name">${m.tim1}</span>
             <span class="score">${m.skor1} - ${m.skor2}</span>
@@ -298,8 +329,8 @@ function renderUI() {
   jadwalContainer.innerHTML = jadwalHTML || '<p class="empty">Tidak ada jadwal pertandingan aktif.</p>';
   hasilContainer.innerHTML = hasilHTML || '<p class="empty">Belum ada hasil pertandingan yang selesai.</p>';
 
-  // Render Bagan Turnamen Menyesuaikan Format
-  if (tournamentType === '4') {
+  // Render Bagan Turnamen Dinamis
+  if (matchesData.SF1 && matchesData.SF2) {
     baganContainer.innerHTML = `
       <div class="bracket-wrapper">
         <div class="round">
