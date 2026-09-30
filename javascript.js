@@ -9,6 +9,21 @@ document.addEventListener('DOMContentLoaded', () => {
   updateAdminUIState();
 });
 
+// Format Waktu Fleksibel
+function formatCustomDate(rawDate, rawTime) {
+  if (!rawDate) return 'Belum diatur';
+  let d = new Date(rawDate);
+  if (isNaN(d)) return 'Belum diatur';
+  
+  let options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+  let dateStr = d.toLocaleDateString('id-ID', options);
+  
+  if (rawTime) {
+    return `${dateStr} - ${rawTime}`;
+  }
+  return dateStr;
+}
+
 // Tambah Kolom Pemain
 function addPlayerInput() {
   const container = document.getElementById('player-inputs-container');
@@ -91,7 +106,7 @@ function getScheduledTeams() {
   return scheduled;
 }
 
-// Update Pilihan Dropdown Tim
+// Update Pilihan Dropdown Tim 
 function updateTeamSelectOptions() {
   const s1 = document.getElementById('match-team1');
   const s2 = document.getElementById('match-team2');
@@ -120,21 +135,11 @@ function updateTeamSelectOptions() {
   s2.innerHTML = opts2;
 }
 
-// Format string datetime-local agar mudah dibaca (misal: 10 Okt 2026, 15:00)
-function formatDateTime(dtString) {
-  if (!dtString) return 'Belum diatur';
-  let dateObj = new Date(dtString);
-  if (isNaN(dateObj)) return dtString;
-  let options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-  return dateObj.toLocaleDateString('id-ID', options);
-}
-
-// Admin Memasukkan Pertandingan Baru
+// Admin Memasukkan Pertandingan Baru (Tanpa Tanggal)
 function createBracketMatch() {
   let round = document.getElementById('match-round').value.trim();
   let t1 = document.getElementById('match-team1').value;
   let t2 = document.getElementById('match-team2').value;
-  let rawDate = document.getElementById('match-date').value;
 
   if (!round || !t1 || !t2) {
     showCustomAlert("Perhatian", "Mohon lengkapi nama babak dan pilih kedua tim!", "error");
@@ -145,15 +150,14 @@ function createBracketMatch() {
     return;
   }
 
-  let formattedDate = rawDate ? formatDateTime(rawDate) : 'Belum diatur';
-
   let newMatch = {
     id: 'match_' + Date.now(),
     round: round,
     tim1: t1,
     tim2: t2,
-    rawDate: rawDate,
-    tanggal: formattedDate,
+    rawDate: '',
+    rawTime: '',
+    tanggal: 'Belum diatur',
     status: 'Mendatang',
     skor1: 0,
     skor2: 0
@@ -165,11 +169,10 @@ function createBracketMatch() {
   document.getElementById('match-round').value = '';
   document.getElementById('match-team1').value = '';
   document.getElementById('match-team2').value = '';
-  document.getElementById('match-date').value = '';
   
   updateTeamSelectOptions();
   renderUI();
-  showCustomAlert("Berhasil", "Jadwal pertandingan berhasil ditambahkan.", "success");
+  showCustomAlert("Berhasil", "Pertandingan berhasil disusun. Silakan atur jadwal waktu di Tab Jadwal.", "success");
 }
 
 // Hapus Pertandingan
@@ -186,8 +189,12 @@ function saveMatchCard(id) {
   if (!match) return;
 
   let rawDate = document.getElementById(`date_${id}`).value;
+  let rawTime = document.getElementById(`time_${id}`).value;
+
   match.rawDate = rawDate;
-  match.tanggal = rawDate ? formatDateTime(rawDate) : 'Segera';
+  match.rawTime = rawTime;
+  match.tanggal = formatCustomDate(rawDate, rawTime);
+
   match.status = document.getElementById(`status_${id}`).value;
   match.skor1 = parseInt(document.getElementById(`skor1_${id}`).value) || 0;
   match.skor2 = parseInt(document.getElementById(`skor2_${id}`).value) || 0;
@@ -295,8 +302,12 @@ function renderUI() {
           
           ${isAdminLoggedIn ? `
             <div class="admin-match-edit-box">
-              <label style="font-size:0.8rem; font-weight:600;">Ubah Waktu:</label>
-              <input type="datetime-local" id="date_${m.id}" value="${m.rawDate || ''}" style="width:100%; margin-bottom:5px; padding:6px;">
+              <label style="font-size:0.8rem; font-weight:600;">Atur Jadwal (Opsional):</label>
+              <div style="display:flex; gap:5px; margin-bottom:5px;">
+                <input type="date" id="date_${m.id}" value="${m.rawDate || ''}" style="width:50%; padding:6px; border:1px solid #ccc; border-radius:4px;">
+                <input type="time" id="time_${m.id}" value="${m.rawTime || ''}" style="width:50%; padding:6px; border:1px solid #ccc; border-radius:4px;">
+              </div>
+              <label style="font-size:0.8rem; font-weight:600;">Status & Skor:</label>
               <select id="status_${m.id}" style="width:100%; margin-bottom:5px; padding:6px;">
                 <option value="Mendatang" ${m.status==='Mendatang'?'selected':''}>Mendatang</option>
                 <option value="Live" ${m.status==='Live'?'selected':''}>Live</option>
@@ -306,8 +317,8 @@ function renderUI() {
                 <input type="number" id="skor1_${m.id}" value="${m.skor1}" min="0" style="flex:1; padding:6px;" placeholder="Skor 1">
                 <input type="number" id="skor2_${m.id}" value="${m.skor2}" min="0" style="flex:1; padding:6px;" placeholder="Skor 2">
               </div>
-              <button type="button" class="btn-save" onclick="saveMatchCard('${m.id}')" style="margin-top:8px; width:100%;">💾 Simpan Jadwal & Skor</button>
-              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️ Hapus Jadwal</button>
+              <button type="button" class="btn-save" onclick="saveMatchCard('${m.id}')" style="margin-top:8px; width:100%;">💾 Simpan Perubahan</button>
+              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️ Hapus Pertandingan</button>
             </div>
           ` : ''}
         </div>
@@ -336,8 +347,9 @@ function renderUI() {
                 <input type="number" id="skor2_${m.id}" value="${m.skor2}" min="0" style="flex:1; padding:6px;">
               </div>
               <input type="hidden" id="date_${m.id}" value="${m.rawDate || ''}">
+              <input type="hidden" id="time_${m.id}" value="${m.rawTime || ''}">
               <button type="button" class="btn-save" onclick="saveMatchCard('${m.id}')" style="margin-top:8px; width:100%;">💾 Koreksi Hasil</button>
-              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️ Hapus Jadwal</button>
+              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️ Hapus Pertandingan</button>
             </div>
           ` : ''}
         </div>
