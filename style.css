@@ -536,3 +536,58 @@ body {
   font-weight: 700;
   letter-spacing: 0.5px;
 }
+
+/* ===============================
+   MODAL & TOMBOL LOGIN MODERN
+   =============================== */
+.modal-header-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* Tombol Batal Modern */
+.btn-modal-cancel {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-modal-cancel:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Tombol Masuk / Login Modern */
+.btn-modal-submit {
+  flex: 1;
+  background: linear-gradient(135deg, var(--secondary), #f59e0b);
+  color: #111111;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-modal-submit:hover {
+  background: linear-gradient(135deg, #ffca28, #d97706);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(255, 193, 7, 0.35);
+}
