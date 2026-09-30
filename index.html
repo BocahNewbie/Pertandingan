@@ -60,17 +60,33 @@
         <button class="btn-logout" onclick="logoutAdmin()">Keluar (Logout)</button>
       </div>
       
-      <!-- Manajemen Tim -->
+      <!-- Manajemen Tim & Pemain -->
       <div class="admin-card" style="margin-bottom: 20px; background: #fffdf0;">
-        <h4>👥 Manajemen Tim Peserta</h4>
-        <div class="input-group" style="display: flex; gap: 10px;">
-          <input type="text" id="new-team-name" placeholder="Nama Tim Baru..." style="flex: 1;">
-          <button type="button" class="btn-save" onclick="addTeam()" style="white-space: nowrap;">➕ Tambah Tim</button>
+        <h4>👥 Pendaftaran Tim & Pemain</h4>
+        
+        <div class="input-group">
+          <label for="new-team-name">Nama Tim:</label>
+          <input type="text" id="new-team-name" placeholder="Masukkan nama tim...">
         </div>
-        <div id="team-list-admin" class="team-chips-container" style="margin-top: 10px;">
-          <!-- Daftar tim terdaftar akan muncul di sini -->
+
+        <div class="input-group">
+          <label>Daftar Pemain (Opsional):</label>
+          <div id="player-inputs-container" class="player-inputs-container">
+            <!-- Kolom input pemain dinamis muncul di sini -->
+          </div>
+          <button type="button" class="btn-secondary" onclick="addPlayerInput()" style="margin-top: 8px;">➕ Tambah Kolom Pemain</button>
         </div>
-        <button type="button" class="btn-danger" onclick="generateBracket()" style="margin-top: 12px; width: 100%;">🔄 Generate / Reset Jadwal Berdasarkan Tim</button>
+
+        <button type="button" class="btn-save" onclick="addTeam()" style="margin-top: 10px; width: 100%;">💾 Simpan Tim & Pemain</button>
+        
+        <div style="margin-top: 15px;">
+          <label style="font-size: 0.9rem; font-weight: 600; margin-bottom: 5px; display: block;">Daftar Tim Terdaftar:</label>
+          <div id="team-list-admin" class="team-chips-container">
+            <!-- Daftar tim terdaftar -->
+          </div>
+        </div>
+
+        <button type="button" class="btn-danger" onclick="generateBracket()" style="margin-top: 15px; width: 100%;">🔄 Generate Jadwal & Bagan Turnamen</button>
       </div>
 
       <!-- Form Edit Pertandingan -->
