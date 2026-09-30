@@ -430,19 +430,24 @@ function renderAdminMatchList() {
   matchesList.forEach(m => {
     html += `
       <div class="match-card">
-        <div class="teams-row" style="font-size: 1.1rem; margin-bottom: 10px;">
+        <div class="teams-row" style="font-size: 1.1rem; margin-bottom: 5px;">
           <span>${m.tim1}</span> <span class="vs">VS</span> <span>${m.tim2}</span>
         </div>
-        <p style="font-size:0.85rem; color:#7f8c8d; font-weight:bold;">Babak: ${m.round}</p>
+        <p style="font-size:0.85rem; color:#7f8c8d; font-weight:bold; margin-bottom: 10px;">Babak: ${m.round}</p>
+        
+        <!-- Info Waktu Sebelumnya untuk Perbandingan -->
+        <div style="background: #f8f9fa; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 12px; border-left: 3px solid #3498db;">
+          🕒 <strong>Jadwal Saat Ini:</strong> ${m.tanggal}
+        </div>
         
         <div class="admin-match-edit">
           <div class="grid-2">
             <div>
-              <label style="font-size:0.8rem; font-weight:600;">Tanggal:</label>
+              <label style="font-size:0.8rem; font-weight:600;">Ubah Tanggal:</label>
               <input type="date" id="date_${m.id}" value="${m.rawDate || ''}">
             </div>
             <div>
-              <label style="font-size:0.8rem; font-weight:600;">Jam:</label>
+              <label style="font-size:0.8rem; font-weight:600;">Ubah Jam:</label>
               <input type="time" id="time_${m.id}" value="${m.rawTime || ''}">
             </div>
           </div>
@@ -496,6 +501,7 @@ function saveMatchCard(id) {
 
   syncToServer('saveMatches', () => {
     showCustomAlert("Disimpan", "Jadwal dan skor diperbarui ke cloud.", "success");
+    renderAdminMatchList();
   });
 }
 
@@ -508,7 +514,7 @@ function deleteMatch(id) {
   });
 }
 
-// Render UI Publik: Prioritas Utama Tanggal Lebih Dulu, Jika Sama Bandingkan Jam Lebih Dulu
+// Render UI Publik: Urutkan tanggal terlebih dahulu, jika sama baru urutkan jam
 function renderPublicUI() {
   const jContainer = document.getElementById('jadwal-container');
   const hContainer = document.getElementById('hasil-container');
@@ -524,19 +530,19 @@ function renderPublicUI() {
     if (hasDateA && !hasDateB) return -1;
     if (!hasDateA && !hasDateB) return 0;
 
-    // 1. Bandingkan Tanggal Terlebih Dahulu
+    // 1. Bandingkan Tanggal Terlebih Dahulu (Paling awal ke mendatang)
     let dateA = new Date(a.rawDate);
     let dateB = new Date(b.rawDate);
 
     if (dateA.getTime() !== dateB.getTime()) {
-      return dateA - dateB; // Tanggal mana yang lebih dulu (maju)
+      return dateA - dateB;
     }
 
     // 2. Jika Tanggal Sama Persis, Bandingkan Jam-nya
     let timeA = a.rawTime && a.rawTime.trim() !== '' ? a.rawTime : '00:00';
     let timeB = b.rawTime && b.rawTime.trim() !== '' ? b.rawTime : '00:00';
 
-    return timeA.localeCompare(timeB); // Jam mana yang lebih dulu
+    return timeA.localeCompare(timeB);
   });
 
   let jHTML = '', hHTML = '';
