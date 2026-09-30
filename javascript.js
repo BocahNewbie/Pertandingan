@@ -1,18 +1,69 @@
-// Database Sederhana dengan LocalStorage
-let matchesData = JSON.parse(localStorage.getItem('turnamen_data')) || {
-  SF1: { id: 'SF1', tim1: 'Tim A', tim2: 'Tim B', tanggal: 'Sabtu, 10 Okt - 15:00', status: 'Mendatang', skor1: 0, skor2: 0 },
-  SF2: { id: 'SF2', tim1: 'Tim C', tim2: 'Tim D', tanggal: 'Sabtu, 10 Okt - 17:00', status: 'Mendatang', skor1: 0, skor2: 0 },
-  F:   { id: 'F',   tim1: 'Pemenang SF1', tim2: 'Pemenang SF2', tanggal: 'Minggu, 11 Okt - 19:00', status: 'Mendatang', skor1: 0, skor2: 0 }
-};
+// Konfigurasi Awal Turnamen (Kosong/Clean State untuk Input Baru)
+let tournamentType = localStorage.getItem('tournament_type') || '4'; // '4' untuk Semifinal+Final, '2' untuk Langsung Final
+
+let matchesData = JSON.parse(localStorage.getItem('turnamen_data')) || getDefaultMatches(tournamentType);
 
 let isAdminLoggedIn = JSON.parse(localStorage.getItem('admin_logged_in')) || false;
 
-// Cek status login saat halaman dimuat
+// Generate Default Matches Berdasarkan Format Turnamen
+function getDefaultMatches(type) {
+  if (type === '4') {
+    return {
+      SF1: { id: 'SF1', tim1: 'Masukkan Tim 1', tim2: 'Masukkan Tim 2', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
+      SF2: { id: 'SF2', tim1: 'Masukkan Tim 3', tim2: 'Masukkan Tim 4', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
+      F:   { id: 'F',   tim1: 'Pemenang SF1', tim2: 'Pemenang SF2', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 }
+    };
+  } else {
+    return {
+      F:   { id: 'F',   tim1: 'Masukkan Tim A', tim2: 'Masukkan Tim B', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 }
+    };
+  }
+}
+
+// Cek status saat halaman dimuat
 document.addEventListener('DOMContentLoaded', () => {
-  updateFinalTeamsAutomatically();
+  document.getElementById('tournament-type').value = tournamentType;
+  updateMatchSelectOptions();
+  updateNextPhaseAutomatically();
   renderUI();
   updateAdminUIState();
 });
+
+// Ubah Format Turnamen (4 Tim atau 2 Tim)
+function changeTournamentFormat() {
+  const newType = document.getElementById('tournament-type').value;
+  if (confirm("Mengubah format akan mereset data pertandingan saat ini. Lanjutkan?")) {
+    tournamentType = newType;
+    localStorage.setItem('tournament_type', tournamentType);
+    matchesData = getDefaultMatches(tournamentType);
+    localStorage.setItem('turnamen_data', JSON.stringify(matchesData));
+    
+    updateMatchSelectOptions();
+    updateNextPhaseAutomatically();
+    renderUI();
+    showCustomAlert("Format Diubah", "Turnamen telah diatur ulang ke format baru.", "success");
+  } else {
+    document.getElementById('tournament-type').value = tournamentType;
+  }
+}
+
+// Perbarui Opsi Dropdown Sesuai Format Turnamen
+function updateMatchSelectOptions() {
+  const select = document.getElementById('match-select');
+  select.innerHTML = '<option value="">-- Pilih Pertandingan --</option>';
+
+  if (tournamentType === '4') {
+    select.innerHTML += `
+      <option value="SF1">Semifinal 1</option>
+      <option value="SF2">Semifinal 2</option>
+      <option value="F">Final</option>
+    `;
+  } else {
+    select.innerHTML += `
+      <option value="F">Final</option>
+    `;
+  }
+}
 
 // Fungsi Navigasi Tab
 function openTab(evt, tabName) {
@@ -87,7 +138,7 @@ function processLogin() {
     localStorage.setItem('admin_logged_in', 'true');
     closeLoginModal();
     updateAdminUIState();
-    showCustomAlert("Berhasil Masuk!", "Selamat datang kembali, Administrator! Anda sekarang dapat mengelola pertandingan.", "success");
+    showCustomAlert("Berhasil Masuk!", "Selamat datang kembali, Administrator! Anda sekarang dapat memasukkan nama tim dan mengelola turnamen.", "success");
   } else {
     showCustomAlert("Gagal Masuk", "Username atau password yang Anda masukkan salah. Silakan coba lagi.", "error");
   }
@@ -144,31 +195,31 @@ function onMatchSelectChange() {
   toggleScoreInput();
 }
 
-// Otomatis Menentukan Pemenang dari Semifinal untuk Masuk ke Final
-function updateFinalTeamsAutomatically() {
-  let sf1 = matchesData.SF1;
-  let sf2 = matchesData.SF2;
-  let finalMatch = matchesData.F;
+// Otomatis Menentukan Pemenang Fase Berikutnya (Misal SF ke Final)
+function updateNextPhaseAutomatically() {
+  if (tournamentType === '4') {
+    let sf1 = matchesData.SF1;
+    let sf2 = matchesData.SF2;
+    let finalMatch = matchesData.F;
 
-  // Jika Semifinal 1 Selesai, tentukan pemenang (skor tertinggi)
-  if (sf1.status === 'Selesai') {
-    if (sf1.skor1 > sf1.skor2) {
-      finalMatch.tim1 = sf1.tim1;
-    } else if (sf1.skor2 > sf1.skor1) {
-      finalMatch.tim1 = sf1.tim2;
-    } else {
-      finalMatch.tim1 = `Pemenang SF1 (${sf1.tim1} / ${sf1.tim2})`;
+    if (sf1 && sf1.status === 'Selesai') {
+      if (sf1.skor1 > sf1.skor2) {
+        finalMatch.tim1 = sf1.tim1;
+      } else if (sf1.skor2 > sf1.skor1) {
+        finalMatch.tim1 = sf1.tim2;
+      } else {
+        finalMatch.tim1 = `Pemenang SF1`;
+      }
     }
-  }
 
-  // Jika Semifinal 2 Selesai, tentukan pemenang (skor tertinggi)
-  if (sf2.status === 'Selesai') {
-    if (sf2.skor1 > sf2.skor2) {
-      finalMatch.tim2 = sf2.tim1;
-    } else if (sf2.skor2 > sf2.skor1) {
-      finalMatch.tim2 = sf2.tim2;
-    } else {
-      finalMatch.tim2 = `Pemenang SF2 (${sf2.tim1} / ${sf2.tim2})`;
+    if (sf2 && sf2.status === 'Selesai') {
+      if (sf2.skor1 > sf2.skor2) {
+        finalMatch.tim2 = sf2.tim1;
+      } else if (sf2.skor2 > sf2.skor1) {
+        finalMatch.tim2 = sf2.tim2;
+      } else {
+        finalMatch.tim2 = `Pemenang SF2`;
+      }
     }
   }
 }
@@ -191,18 +242,16 @@ function saveMatchData() {
     skor2: parseInt(document.getElementById('admin-skor2').value) || 0
   };
 
-  // Jalankan logika otomatisasi untuk babak selanjutnya
-  updateFinalTeamsAutomatically();
+  updateNextPhaseAutomatically();
 
   localStorage.setItem('turnamen_data', JSON.stringify(matchesData));
-  showCustomAlert("Berhasil Disimpan!", "Data pertandingan dan pemenang fase berikutnya telah diperbarui.", "success");
+  showCustomAlert("Berhasil Disimpan!", "Data pertandingan dan bagan telah diperbarui.", "success");
   renderUI();
 }
 
 // Render UI ke Halaman Pengguna
 function renderUI() {
-  // Pastikan data final selalu disinkronkan saat merender
-  updateFinalTeamsAutomatically();
+  updateNextPhaseAutomatically();
 
   const jadwalContainer = document.getElementById('jadwal-container');
   const hasilContainer = document.getElementById('hasil-container');
@@ -249,18 +298,29 @@ function renderUI() {
   jadwalContainer.innerHTML = jadwalHTML || '<p class="empty">Tidak ada jadwal pertandingan aktif.</p>';
   hasilContainer.innerHTML = hasilHTML || '<p class="empty">Belum ada hasil pertandingan yang selesai.</p>';
 
-  // Render Bagan Turnamen
-  baganContainer.innerHTML = `
-    <div class="bracket-wrapper">
-      <div class="round">
-        <h4>Semifinal</h4>
-        <div class="b-match"><span>${matchesData.SF1.tim1} vs ${matchesData.SF1.tim2}</span></div>
-        <div class="b-match"><span>${matchesData.SF2.tim1} vs ${matchesData.SF2.tim2}</span></div>
+  // Render Bagan Turnamen Menyesuaikan Format
+  if (tournamentType === '4') {
+    baganContainer.innerHTML = `
+      <div class="bracket-wrapper">
+        <div class="round">
+          <h4>Semifinal</h4>
+          <div class="b-match"><span>${matchesData.SF1.tim1} vs ${matchesData.SF1.tim2}</span></div>
+          <div class="b-match"><span>${matchesData.SF2.tim1} vs ${matchesData.SF2.tim2}</span></div>
+        </div>
+        <div class="round">
+          <h4>Final</h4>
+          <div class="b-match final"><span>${matchesData.F.tim1} vs ${matchesData.F.tim2}</span></div>
+        </div>
       </div>
-      <div class="round">
-        <h4>Final</h4>
-        <div class="b-match final"><span>${matchesData.F.tim1} vs ${matchesData.F.tim2}</span></div>
+    `;
+  } else {
+    baganContainer.innerHTML = `
+      <div class="bracket-wrapper">
+        <div class="round">
+          <h4>Final</h4>
+          <div class="b-match final"><span>${matchesData.F.tim1} vs ${matchesData.F.tim2}</span></div>
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  }
 }
