@@ -6,7 +6,7 @@
   --color-primary: #e76f51;   /* Merah Bata / Coral Soft */
   --color-secondary: #e9c46a; /* Kuning Pastel Hangat */
   --color-accent: #2a9d8f;    /* Hijau Tosca Soft */
-  --bg-tone: #181c1f;         /* Background Gelap Elegan (Bukan Hitam Pekat) */
+  --bg-tone: #181c1f;         /* Background Gelap Elegan */
   --bg-card: #22272b;         /* Warna Kartu/Kontainer Gelap Senada */
   --text-main: #f0f2f5;       /* Teks Putih Soft Nyaman di Mata */
 }
@@ -19,7 +19,7 @@
 }
 
 body {
-  background: var(--bg-tone); /* Latar belakang gelap elegan */
+  background: var(--bg-tone);
   color: var(--text-main);
   min-height: 100vh;
   padding: 20px;
@@ -57,7 +57,7 @@ body {
   opacity: 0.9;
 }
 
-/* Tombol Login Admin (Kuning Soft Menonjol) */
+/* Tombol Login Admin */
 .btn-admin {
   background-color: var(--color-secondary);
   color: #2b2512;
@@ -125,7 +125,6 @@ body {
 }
 
 .match-card {
-  /* Hijau Soft dengan transparan 40% di atas background gelap */
   background: rgba(42, 157, 143, 0.4); 
   border: 1px solid rgba(42, 157, 143, 0.6);
   border-radius: 12px;
@@ -163,9 +162,16 @@ body {
 
 .match-time {
   font-size: 0.85rem;
-  color: #e2e8f0;
+  color: #ffffff; /* Diubah menjadi putih terang agar jelas */
   font-weight: 600;
   margin-bottom: 8px;
+}
+
+/* Teks Keterangan Babak (Diubah dari abu-abu menjadi kuning soft terang) */
+.match-round-text {
+  color: var(--color-secondary) !important;
+  font-size: 0.85rem !important;
+  font-weight: 600;
 }
 
 .teams-row {
