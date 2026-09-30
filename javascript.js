@@ -27,6 +27,7 @@ function formatCustomDate(rawDate, rawTime) {
 // Tambah Kolom Pemain
 function addPlayerInput() {
   const container = document.getElementById('player-inputs-container');
+  if (!container) return;
   const row = document.createElement('div');
   row.className = 'player-input-row';
   row.innerHTML = `
@@ -39,6 +40,8 @@ function addPlayerInput() {
 // Tambah Tim
 function addTeam() {
   const nameInput = document.getElementById('new-team-name');
+  if (!nameInput) return;
+  
   const teamName = nameInput.value.trim();
   if (!teamName) {
     showCustomAlert("Perhatian", "Nama tim tidak boleh kosong!", "error");
@@ -76,6 +79,8 @@ function removeTeam(index) {
 
 function renderTeamListAdmin() {
   const container = document.getElementById('team-list-admin');
+  if (!container) return;
+  
   if (teamsList.length === 0) {
     container.innerHTML = '<p style="font-size:0.85rem; color:#888;">Belum ada tim.</p>';
     return;
@@ -96,7 +101,7 @@ function renderTeamListAdmin() {
   container.innerHTML = html;
 }
 
-// Mendapatkan daftar tim yang sudah dijadwalkan bertanding
+// Mendapatkan daftar tim yang sudah dijadwalkan
 function getScheduledTeams() {
   let scheduled = new Set();
   matchesList.forEach(m => {
@@ -106,14 +111,15 @@ function getScheduledTeams() {
   return scheduled;
 }
 
-// Update Pilihan Dropdown Tim 
+// Update Pilihan Dropdown Tim (Anti-Error)
 function updateTeamSelectOptions() {
   const s1 = document.getElementById('match-team1');
   const s2 = document.getElementById('match-team2');
   
+  if (!s1 || !s2) return; 
+
   let val1 = s1.value;
   let val2 = s2.value;
-
   let scheduledTeams = getScheduledTeams();
 
   let opts1 = '<option value="">-- Pilih Tim 1 --</option>';
@@ -135,11 +141,20 @@ function updateTeamSelectOptions() {
   s2.innerHTML = opts2;
 }
 
-// Admin Memasukkan Pertandingan Baru (Tanpa Tanggal)
+// Admin Memasukkan Pertandingan Baru
 function createBracketMatch() {
-  let round = document.getElementById('match-round').value.trim();
-  let t1 = document.getElementById('match-team1').value;
-  let t2 = document.getElementById('match-team2').value;
+  const roundEl = document.getElementById('match-round');
+  const t1El = document.getElementById('match-team1');
+  const t2El = document.getElementById('match-team2');
+
+  if (!roundEl || !t1El || !t2El) {
+    alert("Error sistem: Elemen input tidak ditemukan!");
+    return;
+  }
+
+  let round = roundEl.value.trim();
+  let t1 = t1El.value;
+  let t2 = t2El.value;
 
   if (!round || !t1 || !t2) {
     showCustomAlert("Perhatian", "Mohon lengkapi nama babak dan pilih kedua tim!", "error");
@@ -166,13 +181,13 @@ function createBracketMatch() {
   matchesList.push(newMatch);
   localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
 
-  document.getElementById('match-round').value = '';
-  document.getElementById('match-team1').value = '';
-  document.getElementById('match-team2').value = '';
+  roundEl.value = '';
+  t1El.value = '';
+  t2El.value = '';
   
   updateTeamSelectOptions();
   renderUI();
-  showCustomAlert("Berhasil", "Pertandingan berhasil disusun. Silakan atur jadwal waktu di Tab Jadwal.", "success");
+  showCustomAlert("Berhasil", "Pertandingan berhasil disusun. Atur jadwal waktunya di Tab Jadwal Pertandingan.", "success");
 }
 
 // Hapus Pertandingan
@@ -188,16 +203,22 @@ function saveMatchCard(id) {
   let match = matchesList.find(m => m.id === id);
   if (!match) return;
 
-  let rawDate = document.getElementById(`date_${id}`).value;
-  let rawTime = document.getElementById(`time_${id}`).value;
+  const dateEl = document.getElementById(`date_${id}`);
+  const timeEl = document.getElementById(`time_${id}`);
+  const statusEl = document.getElementById(`status_${id}`);
+  const skor1El = document.getElementById(`skor1_${id}`);
+  const skor2El = document.getElementById(`skor2_${id}`);
+
+  let rawDate = dateEl ? dateEl.value : match.rawDate;
+  let rawTime = timeEl ? timeEl.value : match.rawTime;
 
   match.rawDate = rawDate;
   match.rawTime = rawTime;
   match.tanggal = formatCustomDate(rawDate, rawTime);
-
-  match.status = document.getElementById(`status_${id}`).value;
-  match.skor1 = parseInt(document.getElementById(`skor1_${id}`).value) || 0;
-  match.skor2 = parseInt(document.getElementById(`skor2_${id}`).value) || 0;
+  
+  if (statusEl) match.status = statusEl.value;
+  if (skor1El) match.skor1 = parseInt(skor1El.value) || 0;
+  if (skor2El) match.skor2 = parseInt(skor2El.value) || 0;
 
   localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
   showCustomAlert("Berhasil", "Jadwal dan skor berhasil diperbarui.", "success");
@@ -208,22 +229,30 @@ function saveMatchCard(id) {
 function openTab(evt, tabName) {
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(tabName).classList.add('active');
-  evt.currentTarget.classList.add('active');
+  
+  const targetTab = document.getElementById(tabName);
+  if (targetTab) targetTab.classList.add('active');
+  if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
+  
   renderUI();
 }
 
 // Modal Login
 function toggleAdminLoginModal() {
   if (!isAdminLoggedIn) {
-    document.getElementById('login-modal').style.display = 'flex';
+    const modal = document.getElementById('login-modal');
+    if(modal) modal.style.display = 'flex';
     document.getElementById('admin-user').value = '';
     document.getElementById('admin-pass').value = '';
   } else {
     document.getElementById('admin-tab-btn').click();
   }
 }
-function closeLoginModal() { document.getElementById('login-modal').style.display = 'none'; }
+
+function closeLoginModal() { 
+  const modal = document.getElementById('login-modal');
+  if(modal) modal.style.display = 'none'; 
+}
 
 function processLogin() {
   let u = document.getElementById('admin-user').value.trim();
@@ -251,6 +280,8 @@ function logoutAdmin() {
 function updateAdminUIState() {
   let btnTab = document.getElementById('admin-tab-btn');
   let mainBtn = document.getElementById('admin-toggle-btn');
+  if (!btnTab || !mainBtn) return;
+
   if (isAdminLoggedIn) {
     btnTab.style.display = 'block';
     mainBtn.innerText = '🛠️ Panel Admin';
@@ -265,18 +296,27 @@ function updateAdminUIState() {
 function showCustomAlert(title, msg, type) {
   let overlay = document.getElementById('custom-alert');
   let card = document.getElementById('alert-card-box');
+  if (!overlay || !card) {
+    alert(title + "\n" + msg); // Fallback jika HTML alert terhapus
+    return;
+  }
   card.className = "custom-alert-card " + type;
   document.getElementById('alert-emoji').innerText = type === 'success' ? '🎉' : '❌';
   document.getElementById('alert-title').innerText = title;
   document.getElementById('alert-message').innerText = msg;
   overlay.style.display = 'flex';
 }
-function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
+
+function closeCustomAlert() { 
+  let overlay = document.getElementById('custom-alert');
+  if(overlay) overlay.style.display = 'none'; 
+}
 
 // Render UI Jadwal dan Hasil
 function renderUI() {
   const jContainer = document.getElementById('jadwal-container');
   const hContainer = document.getElementById('hasil-container');
+  if (!jContainer || !hContainer) return;
 
   if (matchesList.length === 0) {
     jContainer.innerHTML = '<p class="empty">Belum ada jadwal pertandingan.</p>';
@@ -287,7 +327,6 @@ function renderUI() {
   let jHTML = '', hHTML = '';
 
   matchesList.forEach(m => {
-    // Render Jadwal (Mendatang / Live)
     if (m.status === 'Mendatang' || m.status === 'Live') {
       jHTML += `
         <div class="match-card">
@@ -324,7 +363,6 @@ function renderUI() {
         </div>
       `;
     } 
-    // Render Hasil (Selesai)
     else if (m.status === 'Selesai') {
       hHTML += `
         <div class="match-card">
