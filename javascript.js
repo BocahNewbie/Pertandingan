@@ -93,15 +93,14 @@ function updateTeamSelectOptions() {
   s2.innerHTML = opts;
 }
 
-// Buat Jadwal Pertandingan Baru Manual
-function createNewMatch() {
+// Admin Memasukkan Pertandingan ke Bagan
+function createBracketMatch() {
   let round = document.getElementById('match-round').value.trim();
   let t1 = document.getElementById('match-team1').value;
   let t2 = document.getElementById('match-team2').value;
-  let date = document.getElementById('match-date').value.trim();
 
   if (!round || !t1 || !t2) {
-    showCustomAlert("Perhatian", "Mohon lengkapi babak dan pilih kedua tim!", "error");
+    showCustomAlert("Perhatian", "Mohon lengkapi nama babak dan pilih kedua tim!", "error");
     return;
   }
   if (t1 === t2) {
@@ -114,7 +113,7 @@ function createNewMatch() {
     round: round,
     tim1: t1,
     tim2: t2,
-    tanggal: date || 'Segera',
+    tanggal: 'Belum diatur',
     status: 'Mendatang',
     skor1: 0,
     skor2: 0
@@ -124,9 +123,11 @@ function createNewMatch() {
   localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
 
   document.getElementById('match-round').value = '';
-  document.getElementById('match-date').value = '';
+  document.getElementById('match-team1').value = '';
+  document.getElementById('match-team2').value = '';
+  
   renderUI();
-  showCustomAlert("Berhasil", "Jadwal pertandingan berhasil ditambahkan.", "success");
+  showCustomAlert("Berhasil", "Pertandingan berhasil dimasukkan ke bagan turnamen.", "success");
 }
 
 // Hapus Pertandingan
@@ -136,7 +137,7 @@ function deleteMatch(id) {
   renderUI();
 }
 
-// Simpan Update Pertandingan dari Kartu Jadwal
+// Simpan Jadwal & Skor dari Menu Jadwal
 function saveMatchCard(id) {
   let match = matchesList.find(m => m.id === id);
   if (!match) return;
@@ -147,7 +148,7 @@ function saveMatchCard(id) {
   match.skor2 = parseInt(document.getElementById(`skor2_${id}`).value) || 0;
 
   localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
-  showCustomAlert("Berhasil", "Perubahan pertandingan disimpan.", "success");
+  showCustomAlert("Berhasil", "Jadwal dan skor berhasil diperbarui.", "success");
   renderUI();
 }
 
@@ -180,7 +181,7 @@ function processLogin() {
     localStorage.setItem('admin_logged_in', 'true');
     closeLoginModal();
     updateAdminUIState();
-    showCustomAlert("Berhasil Masuk!", "Panel Admin kini terbuka.", "success");
+    showCustomAlert("Berhasil Masuk!", "Panel Admin terbuka.", "success");
     document.getElementById('admin-tab-btn').click();
   } else {
     showCustomAlert("Gagal", "Username atau password salah!", "error");
@@ -220,26 +221,27 @@ function showCustomAlert(title, msg, type) {
 }
 function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
 
-// Render UI Jadwal, Hasil, dan Bagan
+// Render UI Bagan, Jadwal, dan Hasil
 function renderUI() {
+  const bContainer = document.getElementById('bagan-container');
   const jContainer = document.getElementById('jadwal-container');
   const hContainer = document.getElementById('hasil-container');
-  const bContainer = document.getElementById('bagan-container');
 
   if (matchesList.length === 0) {
+    bContainer.innerHTML = '<p class="empty">Belum ada pertandingan di bagan. Silakan tambahkan melalui Panel Admin.</p>';
     jContainer.innerHTML = '<p class="empty">Belum ada jadwal pertandingan.</p>';
     hContainer.innerHTML = '<p class="empty">Belum ada hasil pertandingan.</p>';
-    bContainer.innerHTML = '<p class="empty">Bagan kosong.</p>';
     return;
   }
 
-  let jHTML = '', hHTML = '';
   let roundsMap = {};
+  let jHTML = '', hHTML = '';
 
   matchesList.forEach(m => {
     if (!roundsMap[m.round]) roundsMap[m.round] = [];
     roundsMap[m.round].push(m);
 
+    // Render Jadwal (Mendatang / Live)
     if (m.status === 'Mendatang' || m.status === 'Live') {
       jHTML += `
         <div class="match-card">
@@ -254,23 +256,25 @@ function renderUI() {
           
           ${isAdminLoggedIn ? `
             <div class="admin-match-edit-box">
-              <input type="text" id="date_${m.id}" value="${m.tanggal}" placeholder="Waktu" style="width:100%; margin-bottom:5px; padding:5px;">
-              <select id="status_${m.id}" style="width:100%; margin-bottom:5px; padding:5px;">
+              <input type="text" id="date_${m.id}" value="${m.tanggal}" placeholder="Atur Waktu (Contoh: Sabtu, 15:00)" style="width:100%; margin-bottom:5px; padding:6px;">
+              <select id="status_${m.id}" style="width:100%; margin-bottom:5px; padding:6px;">
                 <option value="Mendatang" ${m.status==='Mendatang'?'selected':''}>Mendatang</option>
                 <option value="Live" ${m.status==='Live'?'selected':''}>Live</option>
                 <option value="Selesai" ${m.status==='Selesai'?'selected':''}>Selesai</option>
               </select>
               <div class="skor-group">
-                <input type="number" id="skor1_${m.id}" value="${m.skor1}" min="0" style="flex:1; padding:5px;">
-                <input type="number" id="skor2_${m.id}" value="${m.skor2}" min="0" style="flex:1; padding:5px;">
+                <input type="number" id="skor1_${m.id}" value="${m.skor1}" min="0" style="flex:1; padding:6px;" placeholder="Skor 1">
+                <input type="number" id="skor2_${m.id}" value="${m.skor2}" min="0" style="flex:1; padding:6px;" placeholder="Skor 2">
               </div>
-              <button type="button" class="btn-save" onclick="saveMatchCard('${m.id}')" style="margin-top:6px; width:100%;">💾 Simpan</button>
-              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:4px; width:100%;">🗑️ Hapus Laga</button>
+              <button type="button" class="btn-save" onclick="saveMatchCard('${m.id}')" style="margin-top:8px; width:100%;">💾 Simpan Jadwal & Skor</button>
+              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️ Hapus dari Bagan</button>
             </div>
           ` : ''}
         </div>
       `;
-    } else if (m.status === 'Selesai') {
+    } 
+    // Render Hasil (Selesai)
+    else if (m.status === 'Selesai') {
       hHTML += `
         <div class="match-card">
           <span class="badge selesai">Selesai</span>
@@ -282,18 +286,18 @@ function renderUI() {
           </div>
           ${isAdminLoggedIn ? `
             <div class="admin-match-edit-box">
-              <select id="status_${m.id}" style="width:100%; margin-bottom:5px; padding:5px;">
+              <select id="status_${m.id}" style="width:100%; margin-bottom:5px; padding:6px;">
                 <option value="Mendatang">Mendatang</option>
                 <option value="Live">Live</option>
                 <option value="Selesai" selected>Selesai</option>
               </select>
               <div class="skor-group">
-                <input type="number" id="skor1_${m.id}" value="${m.skor1}" min="0" style="flex:1; padding:5px;">
-                <input type="number" id="skor2_${m.id}" value="${m.skor2}" min="0" style="flex:1; padding:5px;">
+                <input type="number" id="skor1_${m.id}" value="${m.skor1}" min="0" style="flex:1; padding:6px;">
+                <input type="number" id="skor2_${m.id}" value="${m.skor2}" min="0" style="flex:1; padding:6px;">
               </div>
               <input type="hidden" id="date_${m.id}" value="${m.tanggal}">
-              <button type="button" class="btn-save" onclick="saveMatchCard('${m.id}')" style="margin-top:6px; width:100%;">💾 Koreksi</button>
-              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:4px; width:100%;">🗑️ Hapus Laga</button>
+              <button type="button" class="btn-save" onclick="saveMatchCard('${m.id}')" style="margin-top:8px; width:100%;">💾 Koreksi Hasil</button>
+              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️ Hapus dari Bagan</button>
             </div>
           ` : ''}
         </div>
@@ -304,13 +308,23 @@ function renderUI() {
   jContainer.innerHTML = jHTML || '<p class="empty">Tidak ada jadwal aktif.</p>';
   hContainer.innerHTML = hHTML || '<p class="empty">Belum ada hasil pertandingan.</p>';
 
-  // Render Bagan
+  // Render Bagan Turnamen Berdasarkan Input Admin
   let bHTML = '<div class="bracket-wrapper">';
   for (let r in roundsMap) {
     bHTML += `<div class="round"><h4>${r}</h4>`;
     roundsMap[r].forEach(m => {
       let isF = r.toLowerCase().includes('final') && !r.toLowerCase().includes('semi');
-      bHTML += `<div class="b-match ${isF ? 'final' : ''}"><span>${m.tim1} vs ${m.tim2}</span></div>`;
+      let scoreDisplay = m.status === 'Selesai' || m.status === 'Live' ? `(${m.skor1} - ${m.skor2})` : 'vs';
+      bHTML += `
+        <div class="b-match ${isF ? 'final' : ''}">
+          <div class="b-match-teams">
+            <span><strong>${m.tim1}</strong></span>
+            <span style="font-size:0.75rem; color:#888; padding: 0 4px;">${scoreDisplay}</span>
+            <span><strong>${m.tim2}</strong></span>
+          </div>
+          <div class="b-match-status">${m.tanggal} • <span style="font-weight:600; color:${m.status==='Live'?'red':'#555'}">${m.status}</span></div>
+        </div>
+      `;
     });
     bHTML += `</div>`;
   }
