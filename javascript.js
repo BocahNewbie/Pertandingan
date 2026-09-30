@@ -22,19 +22,36 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Fungsi Ambil Data dari Google Sheets
+// Fungsi Ambil Data dengan Cache Instan
 function fetchDataFromServer(callback) {
+  // 1. Cek apakah ada data cache lokal sebelumnya agar langsung tampil tanpa menunggu
+  let cachedTeams = localStorage.getItem('cache_teams');
+  let cachedMatches = localStorage.getItem('cache_matches');
+  
+  if (cachedTeams && cachedMatches) {
+    teamsList = JSON.parse(cachedTeams);
+    matchesList = JSON.parse(cachedMatches);
+    // Render langsung menggunakan data cache agar instan
+    if (callback) callback();
+  }
+
+  // 2. Tarik data terbaru dari Google Sheets di latar belakang
   fetch(SCRIPT_URL + '?action=getData')
     .then(res => res.json())
     .then(data => {
       teamsList = data.teams || [];
       matchesList = data.matches || [];
+      
+      // Simpan ke cache lokal
+      localStorage.setItem('cache_teams', JSON.stringify(teamsList));
+      localStorage.setItem('cache_matches', JSON.stringify(matchesList));
+
+      // Update tampilan dengan data paling fresh dari server
       if (callback) callback();
     })
     .catch(err => {
-      console.error("Gagal memuat data dari server:", err);
-      // Fallback jika offline
-      if (callback) callback();
+      console.error("Gagal menyinkronkan dengan server:", err);
+      if (!cachedTeams && callback) callback(); // Jalankan callback walau offline jika cache kosong
     });
 }
 
