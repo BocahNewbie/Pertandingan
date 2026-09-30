@@ -402,15 +402,31 @@ function deleteMatch(id) {
 }
 
 // ==========================================
-// RENDER UI PUBLIK
+// RENDER UI PUBLIK (Diurutkan Berdasarkan Waktu Terdekat)
 // ==========================================
 function renderPublicUI() {
   const jContainer = document.getElementById('jadwal-container');
   const hContainer = document.getElementById('hasil-container');
   if (!jContainer || !hContainer) return;
 
+  // Salin array matchesList agar tidak mengubah data asli di localStorage saat di-sort
+  let sortedMatches = [...matchesList];
+
+  // Urutkan berdasarkan rawDate dan rawTime secara kronologis (terdekat/paling dulu di atas)
+  sortedMatches.sort((a, b) => {
+    // Jika salah satu atau keduanya belum diatur tanggalnya, letakkan di bagian bawah
+    if (!a.rawDate && b.rawDate) return 1;
+    if (a.rawDate && !b.rawDate) return -1;
+    if (!a.rawDate && !b.rawDate) return 0;
+
+    let dateA = new Date(`${a.rawDate}T${a.rawTime || '00:00'}`);
+    let dateB = new Date(`${b.rawDate}T${b.rawTime || '00:00'}`);
+
+    return dateA - dateB; // Urutan dari waktu terawal ke waktu mendatang
+  });
+
   let jHTML = '', hHTML = '';
-  matchesList.forEach(m => {
+  sortedMatches.forEach(m => {
     let cardHTML = `
       <div class="match-card">
         <span class="badge ${m.status.toLowerCase()}">${m.status}</span>
