@@ -60,37 +60,28 @@
         <button class="btn-logout" onclick="logoutAdmin()">Keluar (Logout)</button>
       </div>
       
-      <!-- Pengaturan Turnamen -->
+      <!-- Manajemen Tim -->
       <div class="admin-card" style="margin-bottom: 20px; background: #fffdf0;">
-        <h4>⚙️ Pengaturan Format Turnamen</h4>
-        <div class="form-group">
-          <label for="tournament-type">Pilih Format:</label>
-          <select id="tournament-type" onchange="changeTournamentFormat()">
-            <option value="4">4 Tim (Semifinal & Final)</option>
-            <option value="2">2 Tim (Langsung Final)</option>
-          </select>
+        <h4>👥 Manajemen Tim Peserta</h4>
+        <div class="input-group" style="display: flex; gap: 10px;">
+          <input type="text" id="new-team-name" placeholder="Nama Tim Baru..." style="flex: 1;">
+          <button type="button" class="btn-save" onclick="addTeam()" style="white-space: nowrap;">➕ Tambah Tim</button>
         </div>
+        <div id="team-list-admin" class="team-chips-container" style="margin-top: 10px;">
+          <!-- Daftar tim terdaftar akan muncul di sini -->
+        </div>
+        <button type="button" class="btn-danger" onclick="generateBracket()" style="margin-top: 12px; width: 100%;">🔄 Generate / Reset Jadwal Berdasarkan Tim</button>
       </div>
 
       <!-- Form Edit Pertandingan -->
       <div class="admin-card">
-        <h4>✏️ Edit Detail Pertandingan</h4>
+        <h4>✏️ Edit Jadwal & Skor Pertandingan</h4>
         
         <div class="form-group">
           <label for="match-select">Pilih Pertandingan:</label>
           <select id="match-select" onchange="onMatchSelectChange()">
             <option value="">-- Pilih Pertandingan --</option>
           </select>
-        </div>
-
-        <div class="input-group">
-          <label for="admin-tim1">Nama Tim 1:</label>
-          <input type="text" id="admin-tim1" placeholder="Nama Tim 1">
-        </div>
-
-        <div class="input-group">
-          <label for="admin-tim2">Nama Tim 2:</label>
-          <input type="text" id="admin-tim2" placeholder="Nama Tim 2">
         </div>
 
         <div class="input-group">
@@ -109,17 +100,17 @@
 
         <div class="skor-group" id="skor-input-area" style="display: none;">
           <div class="input-group">
-            <label for="admin-skor1">Skor Tim 1:</label>
+            <label id="label-skor1" for="admin-skor1">Skor Tim 1:</label>
             <input type="number" id="admin-skor1" min="0" value="0">
           </div>
           <div class="input-group">
-            <label for="admin-skor2">Skor Tim 2:</label>
+            <label id="label-skor2" for="admin-skor2">Skor Tim 2:</label>
             <input type="number" id="admin-skor2" min="0" value="0">
           </div>
         </div>
 
         <button type="button" class="btn-save" onclick="saveMatchData()">
-          💾 Simpan Perubahan
+          💾 Simpan Perubahan Match
         </button>
       </div>
     </section>
