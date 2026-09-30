@@ -8,7 +8,7 @@ body {
 }
 
 .container { 
-  max-width: 800px; 
+  max-width: 900px; 
   margin: 0 auto; 
   background: #ffffff; 
   padding: 25px; 
@@ -93,6 +93,15 @@ body {
 .tab-btn.active { 
   background: #c0392b; 
   color: white; 
+}
+
+.admin-tab {
+  background: #f9e79f !important;
+  color: #7d6608 !important;
+}
+.admin-tab.active {
+  background: #d4ac0d !important;
+  color: white !important;
 }
 
 .tab-content { display: none; }
@@ -303,19 +312,17 @@ body {
 }
 .btn-logout:hover { opacity: 0.9; }
 
-.admin-section { 
-  background: #fdfefe; 
-  border: 1px solid #ebedef; 
-  padding: 20px; 
-  border-radius: 8px; 
-  margin-bottom: 20px; 
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+.admin-panel-wrapper {
+  background: #fdfefe;
+  border: 1px solid #ebedef;
+  padding: 20px;
+  border-radius: 8px;
 }
 
 .form-group, .input-group { margin-bottom: 12px; }
 .form-group label, .input-group label { display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: 600; }
 .form-group select, .input-group input, .input-group select { width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; }
-.skor-group { display: flex; gap: 10px; }
+.skor-group { display: flex; gap: 10px; margin-top: 8px; }
 
 .card-grid { display: flex; flex-direction: column; gap: 12px; }
 .match-card { background: #fff; border: 1px solid #e1e8ed; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -329,10 +336,18 @@ body {
 .score { background: #27ae60; color: white; padding: 4px 12px; border-radius: 6px; }
 .live-score { margin-top: 8px; font-size: 0.9rem; color: #e74c3c; font-weight: bold; }
 
-.bracket-wrapper { display: flex; justify-content: space-around; gap: 20px; text-align: center; }
-.round { flex: 1; }
-.round h4 { margin-bottom: 10px; color: #2c3e50; }
-.b-match { background: #f8f9fa; border: 1px solid #ccc; padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 0.9rem; font-weight: 600; }
+/* Admin Edit di Kartu Jadwal */
+.admin-match-edit-box {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #ddd;
+  background: #fdfefe;
+}
+
+.bracket-wrapper { display: flex; justify-content: space-around; gap: 15px; text-align: center; overflow-x: auto; padding-bottom: 10px; }
+.round { flex: 1; min-width: 150px; }
+.round h4 { margin-bottom: 10px; color: #2c3e50; font-size: 0.95rem; background: #eaeded; padding: 6px; border-radius: 4px; }
+.b-match { background: #f8f9fa; border: 1px solid #ccc; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; }
 .b-match.final { background: #fcf3cf; border-color: #f1c40f; }
 
 @keyframes fadeIn {
