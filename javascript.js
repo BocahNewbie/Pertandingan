@@ -1,20 +1,61 @@
-let teamsList = JSON.parse(localStorage.getItem('turnamen_teams')) || [];
-let matchesList = JSON.parse(localStorage.getItem('turnamen_matches_list')) || [];
+// GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjwDxBluacsufJeCiZ8fmNCNtpTLdX0pAYjIpMpqVlv9ssOlJezf36FVKmmbQKfXzF/exec';
+
+let teamsList = [];
+let matchesList = [];
 let isAdminLoggedIn = JSON.parse(localStorage.getItem('admin_logged_in')) || false;
 let editingTeamIndex = -1;
 
+// Saat halaman dimuat, tarik data terbaru dari Google Sheets
 document.addEventListener('DOMContentLoaded', () => {
-  renderTeamListAdmin();
-  updateTeamSelectOptions();
-  
-  if (!isAdminLoggedIn) {
-    localStorage.setItem('admin_logged_in', 'false');
-    switchView('public');
-  } else {
-    switchView('admin');
-  }
-  updateAuthUI();
+  fetchDataFromServer(() => {
+    renderTeamListAdmin();
+    updateTeamSelectOptions();
+    
+    if (!isAdminLoggedIn) {
+      localStorage.setItem('admin_logged_in', 'false');
+      switchView('public');
+    } else {
+      switchView('admin');
+    }
+    updateAuthUI();
+  });
 });
+
+// Fungsi Ambil Data dari Google Sheets
+function fetchDataFromServer(callback) {
+  fetch(SCRIPT_URL + '?action=getData')
+    .then(res => res.json())
+    .then(data => {
+      teamsList = data.teams || [];
+      matchesList = data.matches || [];
+      if (callback) callback();
+    })
+    .catch(err => {
+      console.error("Gagal memuat data dari server:", err);
+      // Fallback jika offline
+      if (callback) callback();
+    });
+}
+
+// Fungsi Simpan Data ke Google Sheets
+function syncToServer(actionType, callback) {
+  let payload = { action: actionType };
+  if (actionType === 'saveTeams') payload.teams = teamsList;
+  if (actionType === 'saveMatches') payload.matches = matchesList;
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors', // Menghindari isu CORS pada Google Apps Script
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    if (callback) callback();
+  }).catch(err => {
+    console.error("Gagal menyimpan ke server:", err);
+    if (callback) callback();
+  });
+}
 
 // ==========================================
 // KONTROL VIEW & AUTENTIKASI
@@ -67,7 +108,8 @@ function switchView(viewName) {
       publicDash.style.display = 'block';
       publicDash.classList.add('active');
     }
-    renderPublicUI();
+    // Sinkronkan data terbaru sebelum ditampilkan ke publik
+    fetchDataFromServer(() => renderPublicUI());
   }
 }
 
@@ -88,13 +130,16 @@ function switchAdminTab(evt, tabName) {
   if (targetTab) targetTab.classList.add('active');
   if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
   
-  if (tabName === 'admin-tim') renderTeamListAdmin();
-  if (tabName === 'admin-bagan') updateTeamSelectOptions();
-  if (tabName === 'admin-jadwal') renderAdminMatchList();
+  // Ambil data terbaru setiap kali pindah tab admin
+  fetchDataFromServer(() => {
+    if (tabName === 'admin-tim') renderTeamListAdmin();
+    if (tabName === 'admin-bagan') updateTeamSelectOptions();
+    if (tabName === 'admin-jadwal') renderAdminMatchList();
+  });
 }
 
 // ==========================================
-// MODAL LOGIN (Auto-Clear Riwayat Ketikan)
+// MODAL LOGIN
 // ==========================================
 function openLoginModal() { 
   const userInput = document.getElementById('admin-user');
@@ -128,7 +173,7 @@ function processLogin() {
     switchView('admin');
     showCustomAlert("Otorisasi Berhasil", "Selamat datang di Panel Administrator.", "success");
   } else {
-    showCustomAlert("Otorisasi Gagal", "Username atau Password yang dimasukkan salah.", "error");
+    showCustomAlert("Otorisasi Gagal", "Username atau Password salah.", "error");
     const passInput = document.getElementById('admin-pass');
     if (passInput) passInput.value = '';
   }
@@ -145,7 +190,7 @@ function logoutAdmin() {
 
   updateAuthUI();
   switchView('public');
-  showCustomAlert("Sesi Berakhir", "Anda telah keluar dari mode Administrator.", "success");
+  showCustomAlert("Sesi Berakhir", "Anda telah keluar dari Administrator.", "success");
 }
 
 // ==========================================
@@ -174,15 +219,14 @@ function addTeam() {
   });
 
   teamsList.push({ name: teamName, players: players });
-  localStorage.setItem('turnamen_teams', JSON.stringify(teamsList));
-
-  nameInput.value = '';
-  const pContainer = document.getElementById('player-inputs-container');
-  if (pContainer) pContainer.innerHTML = '';
-  
-  renderTeamListAdmin();
-  updateTeamSelectOptions();
-  showCustomAlert("Berhasil", `Tim ${teamName} berhasil didaftarkan.`, "success");
+  syncToServer('saveTeams', () => {
+    nameInput.value = '';
+    const pContainer = document.getElementById('player-inputs-container');
+    if (pContainer) pContainer.innerHTML = '';
+    renderTeamListAdmin();
+    updateTeamSelectOptions();
+    showCustomAlert("Berhasil", `Tim ${teamName} didaftarkan ke cloud.`, "success");
+  });
 }
 
 function openEditTeamModal(index) {
@@ -195,12 +239,19 @@ function openEditTeamModal(index) {
   if (!container) return;
   container.innerHTML = '';
   
-  team.players.forEach(p => {
-    const row = document.createElement('div');
-    row.className = 'player-input-row';
-    row.innerHTML = `<input type="text" class="edit-player-name-input" value="${p}"><button type="button" onclick="this.parentElement.remove()">&times;</button>`;
-    container.appendChild(row);
-  });
+  let teamPlayers = team.players;
+  if (typeof teamPlayers === 'string') {
+    try { teamPlayers = JSON.parse(teamPlayers); } catch(e) { teamPlayers = []; }
+  }
+
+  if (Array.isArray(teamPlayers)) {
+    teamPlayers.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'player-input-row';
+      row.innerHTML = `<input type="text" class="edit-player-name-input" value="${p}"><button type="button" onclick="this.parentElement.remove()">&times;</button>`;
+      container.appendChild(row);
+    });
+  }
   
   const editModal = document.getElementById('edit-team-modal');
   if (editModal) editModal.style.display = 'flex';
@@ -244,25 +295,28 @@ function saveEditTeam() {
       if (m.tim1 === oldName) m.tim1 = newName;
       if (m.tim2 === oldName) m.tim2 = newName;
     });
-    localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
   }
 
   teamsList[editingTeamIndex] = { name: newName, players: newPlayers };
-  localStorage.setItem('turnamen_teams', JSON.stringify(teamsList));
-
-  closeEditTeamModal();
-  renderTeamListAdmin();
-  updateTeamSelectOptions();
-  renderAdminMatchList();
-  showCustomAlert("Tersimpan", "Data tim diperbarui.", "success");
+  
+  syncToServer('saveTeams', () => {
+    syncToServer('saveMatches', () => {
+      closeEditTeamModal();
+      renderTeamListAdmin();
+      updateTeamSelectOptions();
+      renderAdminMatchList();
+      showCustomAlert("Tersimpan", "Data tim diperbarui di cloud.", "success");
+    });
+  });
 }
 
 function removeTeam(index) {
   let removed = teamsList.splice(index, 1);
-  localStorage.setItem('turnamen_teams', JSON.stringify(teamsList));
-  renderTeamListAdmin();
-  updateTeamSelectOptions();
-  showCustomAlert("Dihapus", `Tim ${removed[0].name} telah dihapus.`, "success");
+  syncToServer('saveTeams', () => {
+    renderTeamListAdmin();
+    updateTeamSelectOptions();
+    showCustomAlert("Dihapus", `Tim ${removed[0].name} dihapus dari cloud.`, "success");
+  });
 }
 
 function renderTeamListAdmin() {
@@ -275,7 +329,12 @@ function renderTeamListAdmin() {
   
   let html = '';
   teamsList.forEach((t, i) => {
-    let pStr = t.players.length > 0 ? t.players.join(', ') : 'Belum ada data pemain';
+    let pArray = t.players;
+    if (typeof pArray === 'string') {
+      try { pArray = JSON.parse(pArray); } catch(e) { pArray = []; }
+    }
+    let pStr = Array.isArray(pArray) && pArray.length > 0 ? pArray.join(', ') : 'Belum ada data pemain';
+    
     html += `
       <div class="team-chip">
         <div class="team-chip-header">
@@ -355,13 +414,13 @@ function createBracketMatch() {
     skor2: 0
   });
 
-  localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
-  roundInput.value = '';
-  s1.value = '';
-  s2.value = '';
-  
-  updateTeamSelectOptions();
-  showCustomAlert("Tersimpan", "Pertandingan masuk ke bagan. Silakan atur waktu di tab Update Jadwal.", "success");
+  syncToServer('saveMatches', () => {
+    roundInput.value = '';
+    s1.value = '';
+    s2.value = '';
+    updateTeamSelectOptions();
+    showCustomAlert("Tersimpan", "Pertandingan masuk ke cloud.", "success");
+  });
 }
 
 function renderAdminMatchList() {
@@ -385,11 +444,11 @@ function renderAdminMatchList() {
           <div class="grid-2">
             <div>
               <label style="font-size:0.8rem; font-weight:600;">Tanggal:</label>
-              <input type="date" id="date_${m.id}" value="${m.rawDate}">
+              <input type="date" id="date_${m.id}" value="${m.rawDate || ''}">
             </div>
             <div>
               <label style="font-size:0.8rem; font-weight:600;">Jam:</label>
-              <input type="time" id="time_${m.id}" value="${m.rawTime}">
+              <input type="time" id="time_${m.id}" value="${m.rawTime || ''}">
             </div>
           </div>
           <div class="grid-2" style="margin-top: 10px;">
@@ -440,15 +499,18 @@ function saveMatchCard(id) {
   match.skor1 = skor1Input ? (parseInt(skor1Input.value) || 0) : 0;
   match.skor2 = skor2Input ? (parseInt(skor2Input.value) || 0) : 0;
 
-  localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
-  showCustomAlert("Disimpan", "Perubahan jadwal dan skor berhasil disimpan.", "success");
+  syncToServer('saveMatches', () => {
+    showCustomAlert("Disimpan", "Jadwal dan skor diperbarui ke cloud.", "success");
+  });
 }
 
 function deleteMatch(id) {
   matchesList = matchesList.filter(m => m.id !== id);
-  localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
-  updateTeamSelectOptions();
-  renderAdminMatchList();
+  syncToServer('saveMatches', () => {
+    updateTeamSelectOptions();
+    renderAdminMatchList();
+    showCustomAlert("Dihapus", "Pertandingan dihapus dari cloud.", "success");
+  });
 }
 
 // ==========================================
