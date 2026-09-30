@@ -1,6 +1,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-/* Background Utama Menjadi Kuning */
+/* Background Utama Kuning */
 body { 
   background: #f1c40f; 
   color: #2c3e50; 
@@ -45,7 +45,7 @@ body {
   opacity: 0.85; 
 }
 
-/* Navigasi Tab Menjadi Merah */
+/* Navigasi Tab Merah */
 .tabs { 
   display: flex; 
   gap: 10px; 
@@ -76,14 +76,14 @@ body {
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* Styling Modal Popup Modern */
+/* Styling Modal Popup Modern dengan nuansa Kuning */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -92,9 +92,10 @@ body {
 }
 
 .modal-card {
-  background: #ffffff;
+  background: #fffdf0;
+  border: 2px solid #f39c12;
   padding: 25px;
-  border-radius: 10px;
+  border-radius: 12px;
   width: 100%;
   max-width: 380px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
@@ -102,12 +103,12 @@ body {
 
 .modal-card h3 {
   margin-bottom: 8px;
-  color: #2c3e50;
+  color: #d35400;
 }
 
 .modal-card p {
   font-size: 0.85rem;
-  color: #666;
+  color: #555;
   margin-bottom: 15px;
 }
 
@@ -128,6 +129,69 @@ body {
   font-weight: bold;
 }
 .btn-cancel:hover { background: #d0d0d0; }
+
+/* Custom Alert Popup Styling */
+.custom-alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.custom-alert-card {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  border-top: 6px solid #f1c40f;
+}
+
+.custom-alert-card.success {
+  border-top-color: #27ae60;
+}
+
+.custom-alert-card.error {
+  border-top-color: #e74c3c;
+}
+
+.alert-emoji {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.custom-alert-card h4 {
+  margin-bottom: 8px;
+  color: #2c3e50;
+  font-size: 1.2rem;
+}
+
+.custom-alert-card p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.btn-alert-ok {
+  background: #2c3e50;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+}
+.btn-alert-ok:hover { opacity: 0.9; }
 
 .admin-header-panel {
   display: flex;
