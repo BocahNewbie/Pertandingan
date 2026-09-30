@@ -1,16 +1,7 @@
-// State Data Tersimpan
-let teamsList = JSON.parse(localStorage.getItem('turnamen_teams')) || ["Tim A", "Tim B", "Tim C", "Tim D"];
-let matchesData = JSON.parse(localStorage.getItem('turnamen_matches')) || getDefaultMatches();
+// State Data Dibersihkan (Mulai dari Awal tanpa Jadwal/Tim Bawaan)
+let teamsList = JSON.parse(localStorage.getItem('turnamen_teams')) || [];
+let matchesData = JSON.parse(localStorage.getItem('turnamen_matches')) || {};
 let isAdminLoggedIn = JSON.parse(localStorage.getItem('admin_logged_in')) || false;
-
-// Format Default Struktur Pertandingan Berdasarkan Jumlah Tim
-function getDefaultMatches() {
-  return {
-    SF1: { id: 'SF1', round: 'Semifinal 1', tim1: teamsList[0] || 'Tim 1', tim2: teamsList[1] || 'Tim 2', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
-    SF2: { id: 'SF2', round: 'Semifinal 2', tim1: teamsList[2] || 'Tim 3', tim2: teamsList[3] || 'Tim 4', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
-    F:   { id: 'F',   round: 'Final', tim1: 'Pemenang SF1', tim2: 'Pemenang SF2', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 }
-  };
-}
 
 // Inisialisasi Saat Halaman Dimuat
 document.addEventListener('DOMContentLoaded', () => {
@@ -21,24 +12,51 @@ document.addEventListener('DOMContentLoaded', () => {
   updateAdminUIState();
 });
 
-// Tambah Tim Baru
+// Menambahkan Kolom Input Pemain Secara Dinamis
+function addPlayerInput() {
+  const container = document.getElementById('player-inputs-container');
+  const row = document.createElement('div');
+  row.className = 'player-input-row';
+  row.innerHTML = `
+    <input type="text" class="player-name-input" placeholder="Nama pemain...">
+    <button type="button" onclick="this.parentElement.remove()">&times;</button>
+  `;
+  container.appendChild(row);
+}
+
+// Tambah Tim Beserta Pemainnya
 function addTeam() {
-  const input = document.getElementById('new-team-name');
-  const teamName = input.value.trim();
+  const nameInput = document.getElementById('new-team-name');
+  const teamName = nameInput.value.trim();
+  
   if (!teamName) {
     showCustomAlert("Perhatian", "Nama tim tidak boleh kosong!", "error");
     return;
   }
-  if (teamsList.includes(teamName)) {
+  
+  // Periksa apakah tim sudah ada
+  if (teamsList.some(t => t.name.toLowerCase() === teamName.toLowerCase())) {
     showCustomAlert("Perhatian", "Tim dengan nama tersebut sudah terdaftar!", "error");
     return;
   }
 
-  teamsList.push(teamName);
+  // Kumpulkan nama pemain dari kolom input dinamis
+  const playerInputs = document.querySelectorAll('.player-name-input');
+  let players = [];
+  playerInputs.forEach(input => {
+    let pName = input.value.trim();
+    if (pName) players.push(pName);
+  });
+
+  teamsList.push({ name: teamName, players: players });
   localStorage.setItem('turnamen_teams', JSON.stringify(teamsList));
-  input.value = '';
+
+  // Reset form input
+  nameInput.value = '';
+  document.getElementById('player-inputs-container').innerHTML = '';
+
   renderTeamListAdmin();
-  showCustomAlert("Berhasil", `Tim "${teamName}" berhasil ditambahkan.`, "success");
+  showCustomAlert("Berhasil", `Tim "${teamName}" beserta pemainnya berhasil ditambahkan.`, "success");
 }
 
 // Hapus Tim
@@ -46,52 +64,56 @@ function removeTeam(index) {
   const removed = teamsList.splice(index, 1);
   localStorage.setItem('turnamen_teams', JSON.stringify(teamsList));
   renderTeamListAdmin();
-  showCustomAlert("Tim Dihapus", `Tim "${removed}" telah dihapus.`, "success");
+  showCustomAlert("Tim Dihapus", `Tim "${removed[0].name}" telah dihapus.`, "success");
 }
 
 // Render Chip Tim di Panel Admin
 function renderTeamListAdmin() {
   const container = document.getElementById('team-list-admin');
   if (teamsList.length === 0) {
-    container.innerHTML = '<p style="font-size: 0.85rem; color: #888;">Belum ada tim terdaftar.</p>';
+    container.innerHTML = '<p style="font-size: 0.85rem; color: #888;">Belum ada tim terdaftar. Silakan tambahkan tim baru.</p>';
     return;
   }
   let html = '';
   teamsList.forEach((team, idx) => {
+    let playersStr = team.players.length > 0 ? team.players.join(', ') : 'Tidak ada data pemain';
     html += `
       <div class="team-chip">
-        <span>${team}</span>
-        <button type="button" onclick="removeTeam(${idx})" title="Hapus Tim">&times;</button>
+        <div class="team-chip-header">
+          <span><strong>${team.name}</strong></span>
+          <button type="button" onclick="removeTeam(${idx})" title="Hapus Tim">&times;</button>
+        </div>
+        <div class="team-players-list">Pemain: ${playersStr}</div>
       </div>
     `;
   });
   container.innerHTML = html;
 }
 
-// Generate / Reset Jadwal Otomatis Berdasarkan Tim Terdaftar
+// Generate Jadwal & Bagan Otomatis Berdasarkan Daftar Tim Terdaftar
 function generateBracket() {
   if (teamsList.length < 2) {
-    showCustomAlert("Perhatian", "Minimal harus ada 2 tim terdaftar untuk membuat jadwal!", "error");
+    showCustomAlert("Perhatian", "Minimal harus ada 2 tim terdaftar untuk membuat jadwal turnamen!", "error");
     return;
   }
 
   if (confirm("Generate ulang akan mereset jadwal dan skor pertandingan berdasarkan daftar tim saat ini. Lanjutkan?")) {
     if (teamsList.length >= 4) {
       matchesData = {
-        SF1: { id: 'SF1', round: 'Semifinal 1', tim1: teamsList[0], tim2: teamsList[1], tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
-        SF2: { id: 'SF2', round: 'Semifinal 2', tim1: teamsList[2], tim2: teamsList[3], tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
+        SF1: { id: 'SF1', round: 'Semifinal 1', tim1: teamsList[0].name, tim2: teamsList[1].name, tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
+        SF2: { id: 'SF2', round: 'Semifinal 2', tim1: teamsList[2].name, tim2: teamsList[3].name, tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 },
         F:   { id: 'F',   round: 'Final', tim1: 'Pemenang SF1', tim2: 'Pemenang SF2', tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 }
       };
     } else {
       matchesData = {
-        F:   { id: 'F',   round: 'Final', tim1: teamsList[0], tim2: teamsList[1], tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 }
+        F:   { id: 'F',   round: 'Final', tim1: teamsList[0].name, tim2: teamsList[1].name, tanggal: 'Belum ditentukan', status: 'Mendatang', skor1: 0, skor2: 0 }
       };
     }
 
     localStorage.setItem('turnamen_matches', JSON.stringify(matchesData));
     updateMatchSelectOptions();
     renderUI();
-    showCustomAlert("Berhasil", "Jadwal dan bagan berhasil di-generate ulang!", "success");
+    showCustomAlert("Berhasil", "Jadwal dan bagan berhasil di-generate dari daftar tim!", "success");
   }
 }
 
@@ -178,7 +200,7 @@ function processLogin() {
     localStorage.setItem('admin_logged_in', 'true');
     closeLoginModal();
     updateAdminUIState();
-    showCustomAlert("Berhasil Masuk!", "Selamat datang kembali, Administrator! Anda sekarang dapat mengelola tim dan jadwal pertandingan.", "success");
+    showCustomAlert("Berhasil Masuk!", "Selamat datang kembali, Administrator! Anda dapat mendaftarkan tim dan pemain sekarang.", "success");
   } else {
     showCustomAlert("Gagal Masuk", "Username atau password yang Anda masukkan salah. Silakan coba lagi.", "error");
   }
@@ -230,7 +252,6 @@ function onMatchSelectChange() {
   document.getElementById('admin-skor1').value = match.skor1;
   document.getElementById('admin-skor2').value = match.skor2;
   
-  // Ubah label skor agar sesuai nama tim yang bertanding
   document.getElementById('label-skor1').innerText = `Skor (${match.tim1}):`;
   document.getElementById('label-skor2').innerText = `Skor (${match.tim2}):`;
   
@@ -291,6 +312,13 @@ function renderUI() {
   let jadwalHTML = '';
   let hasilHTML = '';
 
+  if (Object.keys(matchesData).length === 0) {
+    jadwalContainer.innerHTML = '<p class="empty">Belum ada jadwal pertandingan. Silakan generate jadwal melalui panel admin.</p>';
+    hasilContainer.innerHTML = '<p class="empty">Belum ada hasil pertandingan.</p>';
+    baganContainer.innerHTML = '<p class="empty">Bagan belum dibuat.</p>';
+    return;
+  }
+
   for (let key in matchesData) {
     let m = matchesData[key];
     
@@ -344,7 +372,7 @@ function renderUI() {
         </div>
       </div>
     `;
-  } else {
+  } else if (matchesData.F) {
     baganContainer.innerHTML = `
       <div class="bracket-wrapper">
         <div class="round">
@@ -353,5 +381,7 @@ function renderUI() {
         </div>
       </div>
     `;
+  } else {
+    baganContainer.innerHTML = '<p class="empty">Bagan belum di-generate.</p>';
   }
 }
