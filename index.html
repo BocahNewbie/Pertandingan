@@ -1,99 +1,134 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Info & Panel Admin Pertandingan</title>
-    <link rel="style" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Info & Panel Admin Pertandingan</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-    <div class="header-area">
-        <h1>🏆 Info & Management Turnamen</h1>
-        <button id="admin-toggle-btn" onclick="toggleAdminPanel()">🔒 Login Admin</button>
-    </div>
+  <div class="container">
+    <!-- Header Utama -->
+    <header class="header-area">
+      <h1>🏆 Info & Management Turnamen</h1>
+      <button id="admin-toggle-btn" class="btn-primary" onclick="toggleAdminPanel()">
+        🔒 Login Admin
+      </button>
+    </header>
 
     <!-- Navigasi Tab -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="openTab(event, 'jadwal')">📅 Jadwal Pertandingan</button>
-        <button class="tab-btn" onclick="openTab(event, 'hasil')">🏁 Hasil Pertandingan</button>
-        <button class="tab-btn" onclick="openTab(event, 'bagan')">🌳 Bagan Turnamen</button>
-    </div>
+    <nav class="tabs" role="tablist" aria-label="Navigasi Turnamen">
+      <button 
+        class="tab-btn active" 
+        role="tab" 
+        aria-selected="true" 
+        aria-controls="jadwal" 
+        onclick="openTab(event, 'jadwal')">
+        📅 Jadwal Pertandingan
+      </button>
+      <button 
+        class="tab-btn" 
+        role="tab" 
+        aria-selected="false" 
+        aria-controls="hasil" 
+        onclick="openTab(event, 'hasil')">
+        🏁 Hasil Pertandingan
+      </button>
+      <button 
+        class="tab-btn" 
+        role="tab" 
+        aria-selected="false" 
+        aria-controls="bagan" 
+        onclick="openTab(event, 'bagan')">
+        🌳 Bagan Turnamen
+      </button>
+    </nav>
 
-    <!-- PANEL ADMIN (Tersembunyi secara default) -->
-    <div id="admin-panel" class="admin-section" style="display: none;">
-        <h3>🛠️ Panel Kontrol Admin</h3>
-        <div class="admin-grid">
-            <!-- Form Input Jadwal & Hasil -->
-            <div class="admin-card">
-                <h4>Update Skor / Jadwal Pertandingan</h4>
-                <label for="match-select">Pilih Pertandingan:</label>
-                <select id="match-select" onchange="onMatchSelectChange()">
-                    <option value="">-- Pilih Pertandingan --</option>
-                    <option value="SF1">Semifinal 1 (Tim A vs Tim B)</option>
-                    <option value="SF2">Semifinal 2 (Tim C vs Tim D)</option>
-                    <option value="F">Final</option>
-                </select>
+    <!-- Panel Admin -->
+    <section id="admin-panel" class="admin-section" style="display: none;" aria-label="Panel Kontrol Admin">
+      <h3>🛠️ Panel Kontrol Admin</h3>
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h4>Update Skor / Jadwal Pertandingan</h4>
+          
+          <div class="form-group">
+            <label for="match-select">Pilih Pertandingan:</label>
+            <select id="match-select" onchange="onMatchSelectChange()">
+              <option value="">-- Pilih Pertandingan --</option>
+              <option value="SF1">Semifinal 1 (Tim A vs Tim B)</option>
+              <option value="SF2">Semifinal 2 (Tim C vs Tim D)</option>
+              <option value="F">Final</option>
+            </select>
+          </div>
 
-                <div class="input-group">
-                    <label>Nama Tim 1:</label>
-                    <input type="text" id="admin-tim1">
-                </div>
-                <div class="input-group">
-                    <label>Nama Tim 2:</label>
-                    <input type="text" id="admin-tim2">
-                </div>
-                <div class="input-group">
-                    <label>Tanggal & Jam:</label>
-                    <input type="text" id="admin-tanggal" placeholder="Contoh: Minggu, 4 Okt - 19:00">
-                </div>
-                <div class="input-group">
-                    <label>Status:</label>
-                    <select id="admin-status">
-                        <option value="Mendatang">Mendatang</option>
-                        <option value="Live">Live</option>
-                        <option value="Selesai">Selesai</option>
-                    </select>
-                </div>
-                <div class="skor-group" id="skor-input-area" style="display:none;">
-                    <div>
-                        <label>Skor Tim 1:</label>
-                        <input type="number" id="admin-skor1" min="0" value="0">
-                    </div>
-                    <div>
-                        <label>Skor Tim 2:</label>
-                        <input type="number" id="admin-skor2" min="0" value="0">
-                    </div>
-                </div>
-                <button class="btn-save" onclick="saveMatchData()">💾 Simpan Perubahan</button>
+          <div class="input-group">
+            <label for="admin-tim1">Nama Tim 1:</label>
+            <input type="text" id="admin-tim1" placeholder="Masukkan nama tim 1">
+          </div>
+
+          <div class="input-group">
+            <label for="admin-tim2">Nama Tim 2:</label>
+            <input type="text" id="admin-tim2" placeholder="Masukkan nama tim 2">
+          </div>
+
+          <div class="input-group">
+            <label for="admin-tanggal">Tanggal & Jam:</label>
+            <input type="text" id="admin-tanggal" placeholder="Contoh: Minggu, 4 Okt - 19:00">
+          </div>
+
+          <div class="input-group">
+            <label for="admin-status">Status:</label>
+            <select id="admin-status">
+              <option value="Mendatang">Mendatang</option>
+              <option value="Live">Live</option>
+              <option value="Selesai">Selesai</option>
+            </select>
+          </div>
+
+          <div class="skor-group" id="skor-input-area" style="display: none;">
+            <div class="input-group">
+              <label for="admin-skor1">Skor Tim 1:</label>
+              <input type="number" id="admin-skor1" min="0" value="0">
             </div>
-        </div>
-    </div>
+            <div class="input-group">
+              <label for="admin-skor2">Skor Tim 2:</label>
+              <input type="number" id="admin-skor2" min="0" value="0">
+            </div>
+          </div>
 
-    <!-- KONTEN USER VIEW -->
-    <!-- Konten Tab: Jadwal -->
-    <div id="jadwal" class="tab-content active">
+          <button type="button" class="btn-save" onclick="saveMatchData()">
+            💾 Simpan Perubahan
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Konten Tab User View -->
+    <main class="content-area">
+      <!-- Tab Jadwal -->
+      <section id="jadwal" class="tab-content active" role="tabpanel">
         <div id="jadwal-container">
-            <p class="loading">Memuat jadwal...</p>
+          <p class="loading">Memuat jadwal...</p>
         </div>
-    </div>
+      </section>
 
-    <!-- Konten Tab: Hasil -->
-    <div id="hasil" class="tab-content">
+      <!-- Tab Hasil -->
+      <section id="hasil" class="tab-content" role="tabpanel">
         <div id="hasil-container">
-            <p class="loading">Memuat hasil pertandingan...</p>
+          <p class="loading">Memuat hasil pertandingan...</p>
         </div>
-    </div>
+      </section>
 
-    <!-- Konten Tab: Bagan -->
-    <div id="bagan" class="tab-content">
-        <div class="bracket" id="bagan-container">
-            <p class="loading">Memuat bagan...</p>
+      <!-- Tab Bagan -->
+      <section id="bagan" class="tab-content" role="tabpanel">
+        <div id="bagan-container" class="bracket">
+          <p class="loading">Memuat bagan...</p>
         </div>
-    </div>
-</div>
+      </section>
+    </main>
+  </div>
 
-<script src="javascript"></script>
+  <script src="javascript.js"></script>
 </body>
 </html>
