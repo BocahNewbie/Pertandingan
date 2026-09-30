@@ -1,4 +1,4 @@
-const APPS_SCRIPT_URL = "https://google.com"; // Ganti dengan URL Web App Anda
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzC7lfRvxIpee3Mtdz8Va5Qm2BEj9WnMZmsnfepGqWduwZLpr4nQEQKjPQ-MK9jH3i/exec"; // Ganti dengan URL Web App Anda
 let globalData = {};
 let isAdmin = false;
 
