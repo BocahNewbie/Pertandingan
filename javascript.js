@@ -17,14 +17,13 @@ function updateAuthUI() {
   const btnLogin = document.getElementById('btn-login-trigger');
   
   if (isAdminLoggedIn) {
-    btnLogin.innerHTML = '🛠️ Buka Dashboard Admin';
+    btnLogin.innerHTML = '🛠️️ Buka Panel Admin';
     btnLogin.classList.add('active-mode');
     btnLogin.onclick = () => switchView('admin');
   } else {
     btnLogin.innerHTML = '🔒 Login Admin';
     btnLogin.classList.remove('active-mode');
     btnLogin.onclick = () => openLoginModal();
-    switchView('public'); // Paksa ke public jika belum login
   }
 }
 
@@ -34,13 +33,14 @@ function switchView(viewName) {
 
   if (viewName === 'admin') {
     if (!isAdminLoggedIn) return openLoginModal();
-    publicDash.classList.remove('active');
-    publicDash.style.display = 'none'; // Sembunyikan publik secara mutlak
     
-    adminDash.style.display = 'block'; // Tampilkan dashboard admin
+    publicDash.classList.remove('active');
+    publicDash.style.display = 'none';
+    
+    adminDash.style.display = 'block';
     adminDash.classList.add('active');
     
-    // Pastikan tab pertama (Kelola Tim) otomatis aktif saat masuk dashboard
+    // Pastikan tab pertama di admin langsung aktif dan ter-render
     const defaultTabBtn = document.querySelector('.admin-sidebar .admin-nav-btn');
     if (defaultTabBtn) {
       defaultTabBtn.click();
@@ -49,9 +49,9 @@ function switchView(viewName) {
     }
   } else {
     adminDash.classList.remove('active');
-    adminDash.style.display = 'none'; // Sembunyikan admin secara mutlak
+    adminDash.style.display = 'none';
     
-    publicDash.style.display = 'block'; // Tampilkan publik
+    publicDash.style.display = 'block';
     publicDash.classList.add('active');
     renderPublicUI();
   }
@@ -67,15 +67,25 @@ function switchPublicTab(evt, tabName) {
 function switchAdminTab(evt, tabName) {
   document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+  
   document.getElementById(tabName).classList.add('active');
   evt.currentTarget.classList.add('active');
+  
+  if (tabName === 'admin-tim') renderTeamListAdmin();
+  if (tabName === 'admin-bagan') updateTeamSelectOptions();
   if (tabName === 'admin-jadwal') renderAdminMatchList();
 }
 
 // ==========================================
 // MODAL LOGIN
 // ==========================================
-function openLoginModal() { document.getElementById('login-modal').style.display = 'flex'; }
+function openLoginModal() { 
+  if (isAdminLoggedIn) {
+    switchView('admin');
+  } else {
+    document.getElementById('login-modal').style.display = 'flex'; 
+  }
+}
 function closeLoginModal() { document.getElementById('login-modal').style.display = 'none'; }
 
 function processLogin() {
@@ -88,7 +98,7 @@ function processLogin() {
     closeLoginModal();
     updateAuthUI();
     switchView('admin');
-    showCustomAlert("Otorisasi Berhasil", "Selamat datang di Dashboard Administrator.", "success");
+    showCustomAlert("Otorisasi Berhasil", "Selamat datang di Panel Administrator.", "success");
   } else {
     showCustomAlert("Otorisasi Gagal", "Username atau Password yang dimasukkan salah.", "error");
   }
@@ -98,6 +108,7 @@ function logoutAdmin() {
   isAdminLoggedIn = false;
   localStorage.setItem('admin_logged_in', 'false');
   updateAuthUI();
+  switchView('public');
   showCustomAlert("Sesi Berakhir", "Anda telah keluar dari mode Administrator.", "success");
 }
 
@@ -203,6 +214,7 @@ function removeTeam(index) {
 
 function renderTeamListAdmin() {
   const container = document.getElementById('team-list-admin');
+  if (!container) return;
   if (teamsList.length === 0) return container.innerHTML = '<p style="color:#888;">Belum ada tim terdaftar.</p>';
   
   let html = '';
@@ -283,11 +295,9 @@ function createBracketMatch() {
   showCustomAlert("Tersimpan", "Pertandingan masuk ke bagan. Silakan atur waktu di tab Update Jadwal.", "success");
 }
 
-// ==========================================
-// RENDER ADMIN MANAGE MATCHES (TAB UPDATE JADWAL)
-// ==========================================
 function renderAdminMatchList() {
   const container = document.getElementById('admin-match-list-container');
+  if (!container) return;
   if (matchesList.length === 0) return container.innerHTML = '<p style="color:#888;">Belum ada pertandingan dibuat.</p>';
 
   let html = '';
