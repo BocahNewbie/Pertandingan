@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Fungsi Ambil Data dengan Cache Instan (Anti Loading Lama)
+// Fungsi Ambil Data dengan Cache Instan
 function fetchDataFromServer(callback) {
   let cachedTeams = localStorage.getItem('cache_teams');
   let cachedMatches = localStorage.getItem('cache_matches');
@@ -508,7 +508,7 @@ function deleteMatch(id) {
   });
 }
 
-// Render UI Publik (Otomatis Urut Tanggal & Jam Terdekat di Paling Atas)
+// Render UI Publik: Urutkan otomatis berdasarkan Tanggal DAN Jam terdekat
 function renderPublicUI() {
   const jContainer = document.getElementById('jadwal-container');
   const hContainer = document.getElementById('hasil-container');
@@ -516,20 +516,18 @@ function renderPublicUI() {
 
   let sortedMatches = [...matchesList];
 
-  // Urutkan berdasarkan Tanggal DAN Jam secara kronologis (waktu terdekat di atas)
   sortedMatches.sort((a, b) => {
     if (!a.rawDate && b.rawDate) return 1;
     if (a.rawDate && !b.rawDate) return -1;
     if (!a.rawDate && !b.rawDate) return 0;
 
-    // Gabungkan tanggal dan jam (jika jam kosong, default ke '00:00')
     let timeA = a.rawTime ? a.rawTime : '00:00';
     let timeB = b.rawTime ? b.rawTime : '00:00';
 
     let dateA = new Date(`${a.rawDate}T${timeA}`);
     let dateB = new Date(`${b.rawDate}T${timeB}`);
 
-    return dateA - dateB; // Dari waktu terawal ke waktu mendatang
+    return dateA - dateB;
   });
 
   let jHTML = '', hHTML = '';
