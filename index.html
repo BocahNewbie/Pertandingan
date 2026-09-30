@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Info & Manajemen Turnamen</title>
+  <title>Manajemen Turnamen Sederhana</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,28 +11,25 @@
   <div class="container">
     <!-- Header Utama -->
     <header class="header-area">
-      <h1>🏆 Info & Manajemen Turnamen</h1>
+      <h1>🏆 Turnamen Sederhana</h1>
       <button id="admin-toggle-btn" class="btn-admin" onclick="toggleAdminLoginModal()">
         🔒 Login Admin
       </button>
     </header>
 
-    <!-- Modal Popup Login Modern -->
+    <!-- Modal Popup Login -->
     <div id="login-modal" class="modal-overlay" style="display: none;">
       <div class="modal-card">
         <h3>🔐 Login Admin</h3>
-        <p>Silakan masukkan kredensial untuk mengakses panel admin.</p>
-        
+        <p>Masukkan username dan password admin.</p>
         <div class="input-group">
-          <label for="admin-user">Username:</label>
-          <input type="text" id="admin-user" placeholder="Masukkan username">
+          <label>Username:</label>
+          <input type="text" id="admin-user" placeholder="admin">
         </div>
-
         <div class="input-group">
-          <label for="admin-pass">Password:</label>
-          <input type="password" id="admin-pass" placeholder="Masukkan password">
+          <label>Password:</label>
+          <input type="password" id="admin-pass" placeholder="123456">
         </div>
-
         <div class="modal-actions">
           <button type="button" class="btn-cancel" onclick="closeLoginModal()">Batal</button>
           <button type="button" class="btn-submit" onclick="processLogin()">Masuk</button>
@@ -41,87 +38,90 @@
     </div>
 
     <!-- Navigasi Tab Utama -->
-    <nav class="tabs" role="tablist" aria-label="Navigasi Turnamen">
-      <button class="tab-btn active" role="tab" aria-selected="true" onclick="openTab(event, 'jadwal')">
-        📅 Jadwal Pertandingan
-      </button>
-      <button class="tab-btn" role="tab" aria-selected="false" onclick="openTab(event, 'hasil')">
-        🏁 Hasil Pertandingan
-      </button>
-      <button class="tab-btn" role="tab" aria-selected="false" onclick="openTab(event, 'bagan')">
-        🌳 Bagan Turnamen
-      </button>
-      <button id="admin-tab-btn" class="tab-btn admin-tab" role="tab" aria-selected="false" onclick="openTab(event, 'admin-panel')" style="display: none;">
-        🛠️ Panel Admin
-      </button>
+    <nav class="tabs" role="tablist">
+      <button class="tab-btn active" role="tab" onclick="openTab(event, 'jadwal')">📅 Jadwal</button>
+      <button class="tab-btn" role="tab" onclick="openTab(event, 'hasil')">🏁 Hasil</button>
+      <button class="tab-btn" role="tab" onclick="openTab(event, 'bagan')">🌳 Bagan</button>
+      <button id="admin-tab-btn" class="tab-btn admin-tab" role="tab" onclick="openTab(event, 'admin-panel')" style="display: none;">🛠️ Panel Admin</button>
     </nav>
 
     <!-- Konten Tab -->
     <main class="content-area">
       <!-- Tab Jadwal -->
       <section id="jadwal" class="tab-content active" role="tabpanel">
-        <div id="jadwal-container" class="card-grid">
-          <p class="loading">Memuat jadwal...</p>
-        </div>
+        <div id="jadwal-container" class="card-grid"></div>
       </section>
 
       <!-- Tab Hasil -->
       <section id="hasil" class="tab-content" role="tabpanel">
-        <div id="hasil-container" class="card-grid">
-          <p class="loading">Memuat hasil pertandingan...</p>
-        </div>
+        <div id="hasil-container" class="card-grid"></div>
       </section>
 
       <!-- Tab Bagan -->
       <section id="bagan" class="tab-content" role="tabpanel">
-        <div id="bagan-container" class="bracket-view">
-          <p class="loading">Memuat bagan...</p>
-        </div>
+        <div id="bagan-container" class="bracket-view"></div>
       </section>
 
-      <!-- Tab Panel Admin Terpisah -->
+      <!-- Tab Panel Admin -->
       <section id="admin-panel" class="tab-content" role="tabpanel">
         <div class="admin-panel-wrapper">
           <div class="admin-header-panel">
-            <h3>🛠️ Panel Kontrol Administrator</h3>
-            <button class="btn-logout" onclick="logoutAdmin()">Keluar (Logout)</button>
+            <h3>🛠️ Kontrol Administrator</h3>
+            <button class="btn-logout" onclick="logoutAdmin()">Keluar</button>
           </div>
-          
-          <!-- Pendaftaran Tim & Pemain -->
-          <div class="admin-card" style="margin-bottom: 20px; background: #fffdf0;">
-            <h4>👥 Pendaftaran Tim & Pemain</h4>
-            
-            <div class="input-group">
-              <label for="new-team-name">Nama Tim:</label>
-              <input type="text" id="new-team-name" placeholder="Masukkan nama tim...">
-            </div>
 
+          <!-- Pendaftaran Tim & Pemain -->
+          <div class="admin-card">
+            <h4>1️⃣ Tambah Tim Peserta</h4>
+            <div class="input-group">
+              <label>Nama Tim:</label>
+              <input type="text" id="new-team-name" placeholder="Contoh: Tim Garuda">
+            </div>
             <div class="input-group">
               <label>Daftar Pemain (Opsional):</label>
               <div id="player-inputs-container" class="player-inputs-container"></div>
-              <button type="button" class="btn-secondary" onclick="addPlayerInput()" style="margin-top: 8px;">➕ Tambah Kolom Pemain</button>
+              <button type="button" class="btn-secondary" onclick="addPlayerInput()" style="margin-top: 6px;">➕ Tambah Kolom Pemain</button>
             </div>
-
-            <button type="button" class="btn-save" onclick="addTeam()" style="margin-top: 10px; width: 100%;">💾 Simpan Tim & Pemain</button>
+            <button type="button" class="btn-save" onclick="addTeam()" style="margin-top: 10px; width: 100%;">💾 Simpan Tim</button>
             
             <div style="margin-top: 15px;">
-              <label style="font-size: 0.9rem; font-weight: 600; margin-bottom: 5px; display: block;">Daftar Tim Terdaftar:</label>
+              <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block;">Tim Terdaftar:</label>
               <div id="team-list-admin" class="team-chips-container"></div>
             </div>
+          </div>
 
-            <button type="button" class="btn-danger" onclick="generateBracket()" style="margin-top: 15px; width: 100%;">🔄 Generate Jadwal & Bagan Dinamis</button>
+          <!-- Buat Jadwal Pertandingan Manual -->
+          <div class="admin-card" style="margin-top: 20px;">
+            <h4>2️⃣ Buat Jadwal Pertandingan</h4>
+            <div class="input-group">
+              <label>Babak / Nama Laga (Misal: Semifinal, Grup A):</label>
+              <input type="text" id="match-round" placeholder="Contoh: Semifinal 1">
+            </div>
+            <div class="input-group">
+              <label>Pilih Tim 1:</label>
+              <select id="match-team1"></select>
+            </div>
+            <div class="input-group">
+              <label>Pilih Tim 2:</label>
+              <select id="match-team2"></select>
+            </div>
+            <div class="input-group">
+              <label>Tanggal & Waktu:</label>
+              <input type="text" id="match-date" placeholder="Contoh: Sabtu, 10 Okt - 15:00">
+            </div>
+            <button type="button" class="btn-save" onclick="createNewMatch()" style="width: 100%;">➕ Tambahkan ke Jadwal</button>
           </div>
         </div>
       </section>
     </main>
   </div>
 
-  <!-- Custom Alert/Popup Notifikasi -->
+  <!-- Custom Alert Modal -->
   <div id="custom-alert" class="custom-alert-overlay" style="display: none;">
     <div class="custom-alert-card" id="alert-card-box">
       <div id="alert-emoji" class="alert-emoji">✨</div>
       <h4 id="alert-title">Notifikasi</h4>
-      <p id="alert-message">Pesan notifikasi...</p>
+      <p id="alert-message">Pesan...</p>
       <button class="btn-alert-ok" onclick="closeCustomAlert()">OK</button>
     </div>
   </div>
