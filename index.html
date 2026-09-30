@@ -60,14 +60,14 @@
         <button class="btn-logout" onclick="logoutAdmin()">Keluar (Logout)</button>
       </div>
       <div class="admin-card">
-        <h4>Update Skor / Jadwal Pertandingan</h4>
+        <h4>Edit & Update Pertandingan</h4>
         
         <div class="form-group">
           <label for="match-select">Pilih Pertandingan:</label>
           <select id="match-select" onchange="onMatchSelectChange()">
             <option value="">-- Pilih Pertandingan --</option>
-            <option value="SF1">Semifinal 1 (Tim A vs Tim B)</option>
-            <option value="SF2">Semifinal 2 (Tim C vs Tim D)</option>
+            <option value="SF1">Semifinal 1</option>
+            <option value="SF2">Semifinal 2</option>
             <option value="F">Final</option>
           </select>
         </div>
@@ -136,6 +136,16 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <!-- Custom Alert/Popup Notifikasi -->
+  <div id="custom-alert" class="custom-alert-overlay" style="display: none;">
+    <div class="custom-alert-card" id="alert-card-box">
+      <div id="alert-emoji" class="alert-emoji">✨</div>
+      <h4 id="alert-title">Notifikasi</h4>
+      <p id="alert-message">Pesan notifikasi...</p>
+      <button class="btn-alert-ok" onclick="closeCustomAlert()">OK</button>
+    </div>
   </div>
 
   <script src="javascript.js"></script>
