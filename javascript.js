@@ -35,12 +35,25 @@ function switchView(viewName) {
   if (viewName === 'admin') {
     if (!isAdminLoggedIn) return openLoginModal();
     publicDash.classList.remove('active');
+    publicDash.style.display = 'none'; // Sembunyikan publik secara mutlak
+    
+    adminDash.style.display = 'block'; // Tampilkan dashboard admin
     adminDash.classList.add('active');
-    renderAdminMatchList(); // Render data untuk admin
+    
+    // Pastikan tab pertama (Kelola Tim) otomatis aktif saat masuk dashboard
+    const defaultTabBtn = document.querySelector('.admin-sidebar .admin-nav-btn');
+    if (defaultTabBtn) {
+      defaultTabBtn.click();
+    } else {
+      renderTeamListAdmin();
+    }
   } else {
     adminDash.classList.remove('active');
+    adminDash.style.display = 'none'; // Sembunyikan admin secara mutlak
+    
+    publicDash.style.display = 'block'; // Tampilkan publik
     publicDash.classList.add('active');
-    renderPublicUI(); // Render data untuk publik
+    renderPublicUI();
   }
 }
 
