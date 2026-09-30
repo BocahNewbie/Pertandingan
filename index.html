@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <!-- Navigasi Tab Utama (Hanya Jadwal & Hasil) -->
+    <!-- Navigasi Tab Utama -->
     <nav class="tabs" role="tablist">
       <button class="tab-btn active" role="tab" onclick="openTab(event, 'jadwal')">📅 Jadwal Pertandingan</button>
       <button class="tab-btn" role="tab" onclick="openTab(event, 'hasil')">🏁 Hasil Selesai</button>
@@ -84,7 +84,7 @@
             </div>
           </div>
 
-          <!-- Langkah 2: Input Pertandingan ke Jadwal -->
+          <!-- Langkah 2: Input Pertandingan ke Jadwal (Dengan Kalender Realtime) -->
           <div class="admin-card" style="margin-top: 20px;">
             <h4>2️⃣ Buat Jadwal Pertemuan Tim</h4>
             <div class="input-group">
@@ -100,8 +100,8 @@
               <select id="match-team2" onchange="updateTeamSelectOptions()"></select>
             </div>
             <div class="input-group">
-              <label>Tanggal & Waktu:</label>
-              <input type="text" id="match-date" placeholder="Contoh: Sabtu, 10 Okt - 15:00">
+              <label>Tanggal & Waktu (Real-time Kalender):</label>
+              <input type="datetime-local" id="match-date">
             </div>
             <button type="button" class="btn-save" onclick="createBracketMatch()" style="width: 100%;">➕ Tambahkan ke Jadwal</button>
           </div>
