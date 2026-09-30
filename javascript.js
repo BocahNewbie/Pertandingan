@@ -79,15 +79,28 @@ function switchAdminTab(evt, tabName) {
 // ==========================================
 // MODAL LOGIN
 // ==========================================
+// Membuka Modal Login & Membersihkan Ketikan Sebelumnya
 function openLoginModal() { 
-  if (isAdminLoggedIn) {
-    switchView('admin');
-  } else {
-    document.getElementById('login-modal').style.display = 'flex'; 
-  }
-}
-function closeLoginModal() { document.getElementById('login-modal').style.display = 'none'; }
+  // Kosongkan riwayat input sebelumnya setiap kali modal dibuka
+  const userInput = document.getElementById('admin-user');
+  const passInput = document.getElementById('admin-pass');
+  if (userInput) userInput.value = '';
+  if (passInput) passInput.value = '';
 
+  document.getElementById('login-modal').style.display = 'flex'; 
+}
+
+// Menutup Modal & Clear Input
+function closeLoginModal() { 
+  const userInput = document.getElementById('admin-user');
+  const passInput = document.getElementById('admin-pass');
+  if (userInput) userInput.value = '';
+  if (passInput) passInput.value = '';
+
+  document.getElementById('login-modal').style.display = 'none'; 
+}
+
+// Proses Login Sukses
 function processLogin() {
   let u = document.getElementById('admin-user').value.trim();
   let p = document.getElementById('admin-pass').value.trim();
@@ -95,18 +108,28 @@ function processLogin() {
   if (u === "admin" && p === "123456") {
     isAdminLoggedIn = true;
     localStorage.setItem('admin_logged_in', 'true');
-    closeLoginModal();
+    closeLoginModal(); // Otomatis clear input & tutup modal
     updateAuthUI();
     switchView('admin');
     showCustomAlert("Otorisasi Berhasil", "Selamat datang di Panel Administrator.", "success");
   } else {
     showCustomAlert("Otorisasi Gagal", "Username atau Password yang dimasukkan salah.", "error");
+    // Fokus kembali ke input password dan bersihkan passwordnya saja
+    document.getElementById('admin-pass').value = '';
   }
 }
 
+// Logout & Clear Sesi Admin
 function logoutAdmin() {
   isAdminLoggedIn = false;
   localStorage.setItem('admin_logged_in', 'false');
+  
+  // Pastikan form login bersih total saat keluar sesi
+  const userInput = document.getElementById('admin-user');
+  const passInput = document.getElementById('admin-pass');
+  if (userInput) userInput.value = '';
+  if (passInput) passInput.value = '';
+
   updateAuthUI();
   switchView('public');
   showCustomAlert("Sesi Berakhir", "Anda telah keluar dari mode Administrator.", "success");
