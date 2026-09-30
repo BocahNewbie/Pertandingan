@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Info & Manajemen Pertandingan</title>
+  <title>Info & Manajemen Turnamen</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -59,16 +59,27 @@
         <h3>🛠️ Panel Kontrol Admin</h3>
         <button class="btn-logout" onclick="logoutAdmin()">Keluar (Logout)</button>
       </div>
+      
+      <!-- Pengaturan Turnamen -->
+      <div class="admin-card" style="margin-bottom: 20px; background: #fffdf0;">
+        <h4>⚙️ Pengaturan Format Turnamen</h4>
+        <div class="form-group">
+          <label for="tournament-type">Pilih Format:</label>
+          <select id="tournament-type" onchange="changeTournamentFormat()">
+            <option value="4">4 Tim (Semifinal & Final)</option>
+            <option value="2">2 Tim (Langsung Final)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Form Edit Pertandingan -->
       <div class="admin-card">
-        <h4>Edit & Update Pertandingan</h4>
+        <h4>✏️ Edit Detail Pertandingan</h4>
         
         <div class="form-group">
           <label for="match-select">Pilih Pertandingan:</label>
           <select id="match-select" onchange="onMatchSelectChange()">
             <option value="">-- Pilih Pertandingan --</option>
-            <option value="SF1">Semifinal 1</option>
-            <option value="SF2">Semifinal 2</option>
-            <option value="F">Final</option>
           </select>
         </div>
 
