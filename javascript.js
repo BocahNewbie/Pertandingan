@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTeamListAdmin();
   updateTeamSelectOptions();
   
-  // Jika refresh halaman saat status belum login, pastikan paksa di tampilan publik & bersihkan sesi
   if (!isAdminLoggedIn) {
     localStorage.setItem('admin_logged_in', 'false');
     switchView('public');
@@ -22,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 function updateAuthUI() {
   const btnLogin = document.getElementById('btn-login-trigger');
+  if (!btnLogin) return;
+
   if (isAdminLoggedIn) {
     btnLogin.innerHTML = '🛠 Buka Panel Admin';
     btnLogin.classList.add('active-mode');
@@ -73,16 +74,19 @@ function switchView(viewName) {
 function switchPublicTab(evt, tabName) {
   document.querySelectorAll('#public-dashboard .tab-content').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('#public-dashboard .tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(tabName).classList.add('active');
-  evt.currentTarget.classList.add('active');
+  
+  const targetTab = document.getElementById(tabName);
+  if (targetTab) targetTab.classList.add('active');
+  if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
 }
 
 function switchAdminTab(evt, tabName) {
   document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
   
-  document.getElementById(tabName).classList.add('active');
-  evt.currentTarget.classList.add('active');
+  const targetTab = document.getElementById(tabName);
+  if (targetTab) targetTab.classList.add('active');
+  if (evt && evt.currentTarget) evt.currentTarget.classList.add('active');
   
   if (tabName === 'admin-tim') renderTeamListAdmin();
   if (tabName === 'admin-bagan') updateTeamSelectOptions();
@@ -98,7 +102,8 @@ function openLoginModal() {
   if (userInput) userInput.value = '';
   if (passInput) passInput.value = '';
 
-  document.getElementById('login-modal').style.display = 'flex'; 
+  const modal = document.getElementById('login-modal');
+  if (modal) modal.style.display = 'flex'; 
 }
 
 function closeLoginModal() { 
@@ -107,7 +112,8 @@ function closeLoginModal() {
   if (userInput) userInput.value = '';
   if (passInput) passInput.value = '';
 
-  document.getElementById('login-modal').style.display = 'none'; 
+  const modal = document.getElementById('login-modal');
+  if (modal) modal.style.display = 'none'; 
 }
 
 function processLogin() {
@@ -123,7 +129,8 @@ function processLogin() {
     showCustomAlert("Otorisasi Berhasil", "Selamat datang di Panel Administrator.", "success");
   } else {
     showCustomAlert("Otorisasi Gagal", "Username atau Password yang dimasukkan salah.", "error");
-    document.getElementById('admin-pass').value = '';
+    const passInput = document.getElementById('admin-pass');
+    if (passInput) passInput.value = '';
   }
 }
 
@@ -146,6 +153,7 @@ function logoutAdmin() {
 // ==========================================
 function addPlayerInput() {
   const container = document.getElementById('player-inputs-container');
+  if (!container) return;
   const row = document.createElement('div');
   row.className = 'player-input-row';
   row.innerHTML = `<input type="text" class="player-name-input" placeholder="Ketik nama pemain..."><button type="button" onclick="this.parentElement.remove()">&times;</button>`;
@@ -154,6 +162,8 @@ function addPlayerInput() {
 
 function addTeam() {
   const nameInput = document.getElementById('new-team-name');
+  if (!nameInput) return;
+
   const teamName = nameInput.value.trim();
   if (!teamName) return showCustomAlert("Peringatan", "Nama tim tidak boleh kosong!", "error");
   if (teamsList.some(t => t.name.toLowerCase() === teamName.toLowerCase())) return showCustomAlert("Peringatan", "Tim sudah terdaftar!", "error");
@@ -167,7 +177,9 @@ function addTeam() {
   localStorage.setItem('turnamen_teams', JSON.stringify(teamsList));
 
   nameInput.value = '';
-  document.getElementById('player-inputs-container').innerHTML = '';
+  const pContainer = document.getElementById('player-inputs-container');
+  if (pContainer) pContainer.innerHTML = '';
+  
   renderTeamListAdmin();
   updateTeamSelectOptions();
   showCustomAlert("Berhasil", `Tim ${teamName} berhasil didaftarkan.`, "success");
@@ -176,32 +188,45 @@ function addTeam() {
 function openEditTeamModal(index) {
   editingTeamIndex = index;
   const team = teamsList[index];
-  document.getElementById('edit-team-name').value = team.name;
+  const editName = document.getElementById('edit-team-name');
+  if (editName) editName.value = team.name;
   
   const container = document.getElementById('edit-player-inputs-container');
+  if (!container) return;
   container.innerHTML = '';
+  
   team.players.forEach(p => {
     const row = document.createElement('div');
     row.className = 'player-input-row';
     row.innerHTML = `<input type="text" class="edit-player-name-input" value="${p}"><button type="button" onclick="this.parentElement.remove()">&times;</button>`;
     container.appendChild(row);
   });
-  document.getElementById('edit-team-modal').style.display = 'flex';
+  
+  const editModal = document.getElementById('edit-team-modal');
+  if (editModal) editModal.style.display = 'flex';
 }
 
 function addPlayerInputEdit() {
   const container = document.getElementById('edit-player-inputs-container');
+  if (!container) return;
   const row = document.createElement('div');
   row.className = 'player-input-row';
   row.innerHTML = `<input type="text" class="edit-player-name-input" placeholder="Ketik nama pemain..."><button type="button" onclick="this.parentElement.remove()">&times;</button>`;
   container.appendChild(row);
 }
 
-function closeEditTeamModal() { document.getElementById('edit-team-modal').style.display = 'none'; editingTeamIndex = -1; }
+function closeEditTeamModal() { 
+  const editModal = document.getElementById('edit-team-modal');
+  if (editModal) editModal.style.display = 'none'; 
+  editingTeamIndex = -1; 
+}
 
 function saveEditTeam() {
   if (editingTeamIndex === -1) return;
-  const newName = document.getElementById('edit-team-name').value.trim();
+  const editNameInput = document.getElementById('edit-team-name');
+  if (!editNameInput) return;
+
+  const newName = editNameInput.value.trim();
   if (!newName) return showCustomAlert("Peringatan", "Nama tim tidak boleh kosong!", "error");
   
   if (teamsList.some((t, i) => i !== editingTeamIndex && t.name.toLowerCase() === newName.toLowerCase())) {
@@ -243,7 +268,10 @@ function removeTeam(index) {
 function renderTeamListAdmin() {
   const container = document.getElementById('team-list-admin');
   if (!container) return;
-  if (teamsList.length === 0) return container.innerHTML = '<p style="color:#888;">Belum ada tim terdaftar.</p>';
+  if (teamsList.length === 0) {
+    container.innerHTML = '<p style="color:#888;">Belum ada tim terdaftar.</p>';
+    return;
+  }
   
   let html = '';
   teamsList.forEach((t, i) => {
@@ -287,7 +315,8 @@ function updateTeamSelectOptions() {
     if (!isScheduled || t.name === s1.value) opts1 += `<option value="${t.name}" ${t.name === s1.value ? 'selected' : ''}>${t.name}</option>`;
     if (!isScheduled || t.name === s2.value) opts2 += `<option value="${t.name}" ${t.name === s2.value ? 'selected' : ''}>${t.name}</option>`;
   });
-  s1.innerHTML = opts1; s2.innerHTML = opts2;
+  s1.innerHTML = opts1; 
+  s2.innerHTML = opts2;
 }
 
 function formatCustomDate(rawDate, rawTime) {
@@ -300,24 +329,36 @@ function formatCustomDate(rawDate, rawTime) {
 }
 
 function createBracketMatch() {
-  let round = document.getElementById('match-round').value.trim();
-  let t1 = document.getElementById('match-team1').value;
-  let t2 = document.getElementById('match-team2').value;
+  const roundInput = document.getElementById('match-round');
+  const s1 = document.getElementById('match-team1');
+  const s2 = document.getElementById('match-team2');
+
+  if (!roundInput || !s1 || !s2) return;
+
+  let round = roundInput.value.trim();
+  let t1 = s1.value;
+  let t2 = s2.value;
 
   if (!round || !t1 || !t2) return showCustomAlert("Gagal", "Lengkapi babak dan pilih kedua tim!", "error");
   if (t1 === t2) return showCustomAlert("Gagal", "Tim 1 dan Tim 2 tidak boleh sama!", "error");
 
   matchesList.push({
     id: 'match_' + Date.now(),
-    round: round, tim1: t1, tim2: t2,
-    rawDate: '', rawTime: '', tanggal: 'Belum diatur',
-    status: 'Mendatang', skor1: 0, skor2: 0
+    round: round, 
+    tim1: t1, 
+    tim2: t2,
+    rawDate: '', 
+    rawTime: '', 
+    tanggal: 'Belum diatur',
+    status: 'Mendatang', 
+    skor1: 0, 
+    skor2: 0
   });
 
   localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
-  document.getElementById('match-round').value = '';
-  document.getElementById('match-team1').value = '';
-  document.getElementById('match-team2').value = '';
+  roundInput.value = '';
+  s1.value = '';
+  s2.value = '';
   
   updateTeamSelectOptions();
   showCustomAlert("Tersimpan", "Pertandingan masuk ke bagan. Silakan atur waktu di tab Update Jadwal.", "success");
@@ -326,7 +367,10 @@ function createBracketMatch() {
 function renderAdminMatchList() {
   const container = document.getElementById('admin-match-list-container');
   if (!container) return;
-  if (matchesList.length === 0) return container.innerHTML = '<p style="color:#888;">Belum ada pertandingan dibuat.</p>';
+  if (matchesList.length === 0) {
+    container.innerHTML = '<p style="color:#888;">Belum ada pertandingan dibuat.</p>';
+    return;
+  }
 
   let html = '';
   matchesList.forEach(m => {
@@ -383,12 +427,18 @@ function saveMatchCard(id) {
   let match = matchesList.find(m => m.id === id);
   if (!match) return;
 
-  match.rawDate = document.getElementById(`date_${id}`).value;
-  match.rawTime = document.getElementById(`time_${id}`).value;
+  const dateInput = document.getElementById(`date_${id}`);
+  const timeInput = document.getElementById(`time_${id}`);
+  const statusInput = document.getElementById(`status_${id}`);
+  const skor1Input = document.getElementById(`skor1_${id}`);
+  const skor2Input = document.getElementById(`skor2_${id}`);
+
+  match.rawDate = dateInput ? dateInput.value : '';
+  match.rawTime = timeInput ? timeInput.value : '';
   match.tanggal = formatCustomDate(match.rawDate, match.rawTime);
-  match.status = document.getElementById(`status_${id}` ).value;
-  match.skor1 = parseInt(document.getElementById(`skor1_${id}`).value) || 0;
-  match.skor2 = parseInt(document.getElementById(`skor2_${id}`).value) || 0;
+  match.status = statusInput ? statusInput.value : 'Mendatang';
+  match.skor1 = skor1Input ? (parseInt(skor1Input.value) || 0) : 0;
+  match.skor2 = skor2Input ? (parseInt(skor2Input.value) || 0) : 0;
 
   localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
   showCustomAlert("Disimpan", "Perubahan jadwal dan skor berhasil disimpan.", "success");
@@ -402,19 +452,16 @@ function deleteMatch(id) {
 }
 
 // ==========================================
-// RENDER UI PUBLIK (Diurutkan Berdasarkan Waktu Terdekat)
+// RENDER UI PUBLIK (Urut Kronologis Waktu Terdekat)
 // ==========================================
 function renderPublicUI() {
   const jContainer = document.getElementById('jadwal-container');
   const hContainer = document.getElementById('hasil-container');
   if (!jContainer || !hContainer) return;
 
-  // Salin array matchesList agar tidak mengubah data asli di localStorage saat di-sort
   let sortedMatches = [...matchesList];
 
-  // Urutkan berdasarkan rawDate dan rawTime secara kronologis (terdekat/paling dulu di atas)
   sortedMatches.sort((a, b) => {
-    // Jika salah satu atau keduanya belum diatur tanggalnya, letakkan di bagian bawah
     if (!a.rawDate && b.rawDate) return 1;
     if (a.rawDate && !b.rawDate) return -1;
     if (!a.rawDate && !b.rawDate) return 0;
@@ -422,7 +469,7 @@ function renderPublicUI() {
     let dateA = new Date(`${a.rawDate}T${a.rawTime || '00:00'}`);
     let dateB = new Date(`${b.rawDate}T${b.rawTime || '00:00'}`);
 
-    return dateA - dateB; // Urutan dari waktu terawal ke waktu mendatang
+    return dateA - dateB;
   });
 
   let jHTML = '', hHTML = '';
@@ -452,10 +499,20 @@ function renderPublicUI() {
 function showCustomAlert(title, msg, type) {
   let overlay = document.getElementById('custom-alert');
   let card = document.getElementById('alert-card-box');
+  if (!overlay || !card) return;
+  
   card.className = "custom-alert-card " + type;
-  document.getElementById('alert-emoji').innerText = type === 'success' ? '✅' : '❌';
-  document.getElementById('alert-title').innerText = title;
-  document.getElementById('alert-message').innerText = msg;
+  const emoji = document.getElementById('alert-emoji');
+  const alertTitle = document.getElementById('alert-title');
+  const alertMsg = document.getElementById('alert-message');
+
+  if (emoji) emoji.innerText = type === 'success' ? '✅' : '❌';
+  if (alertTitle) alertTitle.innerText = title;
+  if (alertMsg) alertMsg.innerText = msg;
   overlay.style.display = 'flex';
 }
-function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
+
+function closeCustomAlert() { 
+  let overlay = document.getElementById('custom-alert');
+  if (overlay) overlay.style.display = 'none'; 
+}
