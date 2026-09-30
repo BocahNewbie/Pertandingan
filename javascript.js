@@ -5,7 +5,13 @@ let matchesData = JSON.parse(localStorage.getItem('turnamen_data')) || {
   F:   { id: 'F',   tim1: 'Pemenang SF1', tim2: 'Pemenang SF2', tanggal: 'Minggu, 11 Okt - 19:00', status: 'Mendatang', skor1: 0, skor2: 0 }
 };
 
-let isAdminLoggedIn = false;
+let isAdminLoggedIn = JSON.parse(localStorage.getItem('admin_logged_in')) || false;
+
+// Cek status login saat halaman dimuat
+document.addEventListener('DOMContentLoaded', () => {
+  renderUI();
+  updateAdminUIState();
+});
 
 // Fungsi Navigasi Tab
 function openTab(evt, tabName) {
@@ -25,23 +31,60 @@ function openTab(evt, tabName) {
   renderUI();
 }
 
-// Toggle Tampilan Panel Admin
+// Menampilkan Popup Modal Login
 function toggleAdminPanel() {
+  if (!isAdminLoggedIn) {
+    document.getElementById('login-modal').style.display = 'flex';
+    document.getElementById('admin-user').value = '';
+    document.getElementById('admin-pass').value = '';
+    document.getElementById('admin-user').focus();
+  } else {
+    // Jika sudah login, tombol utama bisa dipakai untuk menutup/membuka panel admin
+    const panel = document.getElementById('admin-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
+// Menutup Popup Modal Login
+function closeLoginModal() {
+  document.getElementById('login-modal').style.display = 'none';
+}
+
+// Proses Validasi Username & Password (Default: admin / 123456)
+function processLogin() {
+  const user = document.getElementById('admin-user').value.trim();
+  const pass = document.getElementById('admin-pass').value.trim();
+
+  // Ubah username & password sesuai keinginan Anda di sini
+  if (user === "admin" && pass === "123456") {
+    isAdminLoggedIn = true;
+    localStorage.setItem('admin_logged_in', 'true');
+    closeLoginModal();
+    updateAdminUIState();
+    alert("Login Berhasil!");
+  } else {
+    alert("Username atau Password salah!");
+  }
+}
+
+// Logout Admin
+function logoutAdmin() {
+  isAdminLoggedIn = false;
+  localStorage.setItem('admin_logged_in', 'false');
+  updateAdminUIState();
+  alert("Anda telah keluar dari panel admin.");
+}
+
+// Perbarui Tampilan Tombol & Panel Berdasarkan Status Login
+function updateAdminUIState() {
   const panel = document.getElementById('admin-panel');
   const btn = document.getElementById('admin-toggle-btn');
-  
-  if (!isAdminLoggedIn) {
-    let pin = prompt("Masukkan PIN Admin (Contoh: 1234):");
-    if (pin === "1234") {
-      isAdminLoggedIn = true;
-      panel.style.display = 'block';
-      btn.innerText = '🔓 Tutup Panel Admin';
-      btn.style.background = '#c0392b';
-    } else if (pin !== null) {
-      alert("PIN Salah!");
-    }
+
+  if (isAdminLoggedIn) {
+    panel.style.display = 'block';
+    btn.innerText = '🛠️ Sembunyikan Panel Admin';
+    btn.style.background = '#c0392b';
   } else {
-    isAdminLoggedIn = false;
     panel.style.display = 'none';
     btn.innerText = '🔒 Login Admin';
     btn.style.background = '';
@@ -160,6 +203,3 @@ function renderUI() {
     </div>
   `;
 }
-
-// Jalankan render saat halaman pertama kali dibuka
-document.addEventListener('DOMContentLoaded', renderUI);
