@@ -1,5 +1,5 @@
 // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjwDxBluacsufJeCiZ8fmNCNtpTLdX0pAYjIpMpqVlv9ssOlJezf36FVKmmbQKfXzF/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxC-Ey8aA5lx8Aa8LohL9xwD-i_7ROd7B07-lgwEOXR1g40ftsdkwnwvBvW9oDA9oDd/exec';
 
 let teamsList = [];
 let matchesList = [];
