@@ -1,100 +1,463 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+/* ===============================
+   TEMA UTAMA: KUNING, MERAH & HIJAU TRANSPARAN
+   =============================== */
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+:root {
+  --color-primary: #e74c3c; /* Merah */
+  --color-secondary: #f1c40f; /* Kuning */
+  --color-accent: #27ae60;
+  --bg-dark: #121212;
+  --bg-light: #f9f9f9;
+  --text-main: #333333;
+}
 
-body { background: #f1c40f; color: #2c3e50; padding: 20px; line-height: 1.5; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-.container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-.view-section { display: none; animation: fadeIn 0.3s ease; }
-.view-section.active { display: block; }
+body {
+  background: linear-gradient(135deg, #fdfbf7 0%, #ebedee 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 20px;
+}
 
-/* Headers */
-.header-area, .admin-header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #f1f2f6; padding-bottom: 15px; }
-.header-title h1 { font-size: 1.6rem; color: #2c3e50; margin-bottom: 4px; }
-.header-title p { font-size: 0.9rem; color: #7f8c8d; }
+/* Kontainer Utama */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border-top: 5px solid var(--color-secondary); /* Aksen Kuning */
+}
 
-/* Buttons */
-button { font-family: 'Inter', sans-serif; transition: all 0.2s ease; }
-.btn-admin { background: #2c3e50; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-.btn-admin.active-mode { background: #e67e22; }
-.btn-save, .btn-submit { background: #27ae60; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-.btn-secondary { background: #3498db; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-.btn-danger { background: #e74c3c; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-.btn-outline { background: transparent; color: #3498db; border: 2px solid #3498db; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
-.btn-cancel { background: #ecf0f1; color: #7f8c8d; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+/* Header Area */
+.header-area {
+  background: linear-gradient(135deg, var(--color-primary), #c0392b); /* Nuansa Merah */
+  color: #ffffff;
+  padding: 25px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 4px solid var(--color-secondary); /* Garis Kuning */
+}
 
-button:hover { filter: brightness(0.9); transform: translateY(-1px); }
-button:active { transform: translateY(0); }
+.header-title h1 {
+  font-size: 1.6rem;
+  margin-bottom: 5px;
+}
 
-/* Tabs Publik (Merah) */
-.tabs { display: flex; gap: 10px; margin-bottom: 25px; }
-.tab-btn { flex: 1; padding: 14px; background: #fadbd8; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; color: #c0392b; font-size: 0.95rem; }
-.tab-btn.active { background: #c0392b; color: white; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3); }
-.tab-content { display: none; animation: fadeIn 0.3s ease; }
-.tab-content.active { display: block; }
+.header-title p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
 
-/* Layout Dashboard Admin */
-.admin-layout { display: flex; gap: 25px; align-items: flex-start; }
-.admin-sidebar { width: 220px; display: flex; flex-direction: column; gap: 10px; }
-.admin-nav-btn { background: #f8f9fa; border: none; padding: 12px 16px; border-radius: 8px; text-align: left; cursor: pointer; font-weight: 600; color: #34495e; }
-.admin-nav-btn.active { background: #d4ac0d; color: white; box-shadow: 0 4px 15px rgba(212, 172, 13, 0.3); }
-.admin-content { flex: 1; }
-.admin-tab-content { display: none; animation: fadeIn 0.3s ease; }
-.admin-tab-content.active { display: block; }
-.admin-card { background: #fdfefe; border: 1px solid #eee; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-.admin-card h3 { margin-bottom: 20px; color: #2c3e50; font-size: 1.2rem; border-bottom: 2px solid #f1f2f6; padding-bottom: 10px; }
+/* Tombol Login Admin (Warna Kuning Menonjol) */
+.btn-admin {
+  background-color: var(--color-secondary);
+  color: #2c3e50;
+  border: none;
+  padding: 10px 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
 
-/* Forms & Inputs */
-.form-group, .input-group { margin-bottom: 15px; }
-.input-group label { display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; color: #34495e; }
-input, select { width: 100%; padding: 10px 14px; border: 1.5px solid #dfe6e9; border-radius: 8px; font-size: 0.95rem; outline: none; transition: border 0.2s; background: #fafafa; }
-input:focus, select:focus { border-color: #3498db; background: #fff; }
+.btn-admin:hover {
+  background-color: #f39c12;
+  transform: translateY(-1px);
+}
 
-.player-inputs-container { display: flex; flex-direction: column; gap: 8px; }
-.player-input-row { display: flex; gap: 8px; }
-.player-input-row input { flex: 1; }
-.player-input-row button { background: #e74c3c; color: white; border: none; padding: 0 12px; border-radius: 8px; cursor: pointer; }
+.btn-admin.active-mode {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
 
-/* Chips Tim */
-.team-chips-container { display: flex; flex-wrap: wrap; gap: 12px; }
-.team-chip { background: #fff; border: 1px solid #e1e8ed; padding: 12px 15px; border-radius: 10px; flex: 1; min-width: 200px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-.team-chip-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f2f6; padding-bottom: 8px; margin-bottom: 8px; }
-.team-chip-header strong { color: #2c3e50; font-size: 1.05rem; }
-.team-players { font-size: 0.8rem; color: #7f8c8d; line-height: 1.4; }
+/* Navigasi Tab Publik */
+.tabs {
+  display: flex;
+  background: #f1f2f6;
+  border-bottom: 1px solid #ddd;
+}
 
-/* Grid Card Match (Publik) */
-.card-grid { display: flex; flex-direction: column; gap: 15px; }
-.match-card { background: #fff; border: 1px solid #ecf0f1; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); position: relative; }
-.badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
-.badge.mendatang { background: #f39c12; }
-.badge.live { background: #e74c3c; animation: pulse 1.5s infinite; }
-.badge.selesai { background: #27ae60; }
-.match-time { font-size: 0.85rem; color: #7f8c8d; margin: 12px 0 8px 0; font-weight: 600; }
-.teams-row { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.2rem; color: #2c3e50; }
-.vs { font-size: 0.85rem; color: #95a5a6; background: #f1f2f6; padding: 4px 10px; border-radius: 6px; }
-.score { background: #27ae60; color: white; padding: 6px 16px; border-radius: 8px; font-size: 1.3rem; }
+.tab-btn {
+  flex: 1;
+  padding: 14px;
+  background: none;
+  border: none;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: 0.2s;
+}
 
-/* Match Card Edit Admin */
-.admin-match-edit { border-top: 1px dashed #dfe6e9; margin-top: 15px; padding-top: 15px; background: #fafafa; border-radius: 8px; padding: 15px; }
-.admin-match-edit .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tab-btn.active {
+  background: #ffffff;
+  color: var(--color-primary);
+  border-bottom: 3px solid var(--color-primary);
+}
 
-/* Modal & Popups Modern (Glassmorphism) */
-.modal-overlay, .custom-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 9999; animation: fadeIn 0.2s ease; }
-.modal-card, .custom-alert-card { background: #ffffff; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5); }
-.modal-title { color: #2c3e50; font-size: 1.4rem; margin-bottom: 5px; }
-.modal-subtitle { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 20px; }
-.custom-alert-card { text-align: center; }
-.custom-alert-card.success { border-top: 6px solid #27ae60; }
-.custom-alert-card.error { border-top: 6px solid #e74c3c; }
-.alert-emoji { font-size: 3.5rem; margin-bottom: 15px; }
-.btn-alert-ok { background: #2c3e50; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 1rem; }
+.content-area {
+  padding: 20px;
+}
 
-@keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+.tab-content {
+  display: none;
+}
 
-/* Responsiveness */
-@media (max-width: 768px) {
-  .admin-layout { flex-direction: column; }
-  .admin-sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding-bottom: 10px; }
-  .admin-nav-btn { white-space: nowrap; }
+.tab-content.active {
+  display: block;
+}
+
+/* ===============================
+   KOTAK / CARD (HIJAU TRANSPARAN 40%)
+   =============================== */
+.card-grid {
+  display: grid;
+  gap: 15px;
+}
+
+.match-card {
+  /* Hijau dengan transparansi 40% menggunakan format rgba (#2ecc71 setara dengan rgba(46, 204, 113)) */
+  background: rgba(46, 204, 113, 0.4); 
+  border: 1px solid rgba(39, 174, 96, 0.5);
+  border-radius: 10px;
+  padding: 18px;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+  backdrop-filter: blur(4px); /* Efek kaca transparan modern */
+}
+
+/* Badge Status Pertandingan */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.badge.mendatang {
+  background-color: var(--color-secondary);
+  color: #7f6000;
+}
+
+.badge.live {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.badge.selesai {
+  background-color: #95a5a6;
+  color: #ffffff;
+}
+
+.match-time {
+  font-size: 0.85rem;
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.teams-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #1e272e;
+}
+
+.vs {
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.score {
+  background: var(--color-primary);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 1.2rem;
+}
+
+/* ===============================
+   ADMIN & MODAL STYLING
+   =============================== */
+.admin-header-area {
+  background: linear-gradient(135deg, var(--color-primary), #c0392b);
+  color: #ffffff;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 4px solid var(--color-secondary);
+}
+
+.admin-layout {
+  display: flex;
+  min-height: 450px;
+}
+
+.admin-sidebar {
+  width: 220px;
+  background: #2c3e50;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-nav-btn {
+  padding: 15px 20px;
+  background: none;
+  border: none;
+  text-align: left;
+  color: #bdc3c7;
+  font-weight: 600;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  transition: 0.2s;
+}
+
+.admin-nav-btn:hover {
+  background: #34495e;
+  color: #ffffff;
+}
+
+.admin-nav-btn.active {
+  background: #34495e;
+  color: var(--color-secondary);
+  border-left-color: var(--color-secondary);
+}
+
+.admin-content {
+  flex: 1;
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.admin-tab-content {
+  display: none;
+}
+
+.admin-tab-content.active {
+  display: block;
+}
+
+.admin-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-left: 4px solid var(--color-primary);
+}
+
+.admin-card h3 {
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-size: 1.2rem;
+}
+
+.input-group {
+  margin-bottom: 12px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #4b6584;
+}
+
+.input-group input, .admin-match-edit select, .admin-match-edit input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+/* Tombol Aksi */
+.btn-save {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-save:hover {
+  background-color: #c0392b;
+}
+
+.btn-danger {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px dashed var(--color-primary);
+  color: var(--color-primary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 600;
+}
+
+.btn-outline:hover {
+  background: rgba(231, 76, 60, 0.05);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  border-top: 5px solid var(--color-secondary);
+}
+
+.modal-title {
+  font-size: 1.3rem;
+  margin-bottom: 5px;
+  color: #2c3e50;
+}
+
+.modal-subtitle {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+  margin-bottom: 15px;
+}
+
+.team-chips-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.team-chip {
+  background: rgba(46, 204, 113, 0.2); /* Hijau transparan tipis untuk daftar tim */
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 3px solid var(--color-accent);
+}
+
+.team-chip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.team-players {
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 5px;
+}
+
+.player-inputs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.player-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.player-input-row input {
+  flex: 1;
+}
+
+.player-input-row button {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.admin-match-edit {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+/* Custom Alert Popup */
+.custom-alert-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.custom-alert-card {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  border-top: 5px solid var(--color-secondary);
+}
+
+.alert-emoji {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.btn-alert-ok {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  margin-top: 15px;
+  cursor: pointer;
+  font-weight: bold;
 }
