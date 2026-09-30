@@ -41,6 +41,17 @@ body {
   transition: 0.2s; 
 }
 
+.btn-secondary {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 .btn-danger {
   background: #e74c3c;
   color: white;
@@ -52,7 +63,7 @@ body {
   transition: 0.2s;
 }
 
-.btn-admin:hover, .btn-save:hover, .btn-submit:hover, .btn-danger:hover { 
+.btn-admin:hover, .btn-save:hover, .btn-submit:hover, .btn-secondary:hover, .btn-danger:hover { 
   opacity: 0.85; 
 }
 
@@ -87,6 +98,36 @@ body {
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
+/* Kolom Input Pemain Dinamis */
+.player-inputs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.player-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.player-input-row input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.player-input-row button {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
 /* Chip Tim Terdaftar */
 .team-chips-container {
   display: flex;
@@ -98,22 +139,37 @@ body {
   background: #e8f4fd;
   border: 1px solid #3498db;
   color: #2980b9;
-  padding: 4px 10px;
-  border-radius: 20px;
+  padding: 6px 12px;
+  border-radius: 8px;
   font-size: 0.85rem;
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  gap: 4px;
   font-weight: 600;
+  min-width: 130px;
 }
 
-.team-chip button {
+.team-chip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(52, 152, 219, 0.2);
+  padding-bottom: 2px;
+}
+
+.team-chip-header button {
   background: none;
   border: none;
   color: #e74c3c;
   cursor: pointer;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 1rem;
+}
+
+.team-players-list {
+  font-size: 0.75rem;
+  color: #555;
+  font-weight: normal;
 }
 
 /* Styling Modal Popup Modern */
