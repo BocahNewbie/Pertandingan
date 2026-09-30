@@ -1,1 +1,45 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info Pertandingan Turnamen</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<div class="container">
+    <h1>🏆 Info Turnamen Sepak Bola</h1>
+
+    <!-- Navigasi Tab -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'jadwal')">📅 Jadwal Pertandingan</button>
+        <button class="tab-btn" onclick="openTab(event, 'hasil')">🏁 Hasil Pertandingan</button>
+        <button class="tab-btn" onclick="openTab(event, 'bagan')">🌳 Bagan Turnamen</button>
+    </div>
+
+    <!-- Konten Tab: Jadwal -->
+    <div id="jadwal" class="tab-content active">
+        <div id="jadwal-container">
+            <p class="loading">Memuat jadwal...</p>
+        </div>
+    </div>
+
+    <!-- Konten Tab: Hasil -->
+    <div id="hasil" class="tab-content">
+        <div id="hasil-container">
+            <p class="loading">Memuat hasil pertandingan...</p>
+        </div>
+    </div>
+
+    <!-- Konten Tab: Bagan -->
+    <div id="bagan" class="tab-content">
+        <div class="bracket" id="bagan-container">
+            <p class="loading">Memuat bagan...</p>
+        </div>
+    </div>
+</div>
+
+<script href="script.js"></script>
+</body>
+</html>
