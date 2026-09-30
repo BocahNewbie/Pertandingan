@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manajemen Turnamen Sederhana</title>
+  <title>Manajemen Turnamen Berbasis Bagan</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
   <div class="container">
     <!-- Header Utama -->
     <header class="header-area">
-      <h1>🏆 Turnamen Sederhana</h1>
+      <h1>🏆 Turnamen Berbasis Bagan</h1>
       <button id="admin-toggle-btn" class="btn-admin" onclick="toggleAdminLoginModal()">
         🔒 Login Admin
       </button>
@@ -39,27 +39,27 @@
 
     <!-- Navigasi Tab Utama -->
     <nav class="tabs" role="tablist">
-      <button class="tab-btn active" role="tab" onclick="openTab(event, 'jadwal')">📅 Jadwal</button>
-      <button class="tab-btn" role="tab" onclick="openTab(event, 'hasil')">🏁 Hasil</button>
-      <button class="tab-btn" role="tab" onclick="openTab(event, 'bagan')">🌳 Bagan</button>
+      <button class="tab-btn active" role="tab" onclick="openTab(event, 'bagan')">🌳 Bagan Turnamen</button>
+      <button class="tab-btn" role="tab" onclick="openTab(event, 'jadwal')">📅 Jadwal & Skor</button>
+      <button class="tab-btn" role="tab" onclick="openTab(event, 'hasil')">🏁 Hasil Selesai</button>
       <button id="admin-tab-btn" class="tab-btn admin-tab" role="tab" onclick="openTab(event, 'admin-panel')" style="display: none;">🛠️ Panel Admin</button>
     </nav>
 
     <!-- Konten Tab -->
     <main class="content-area">
+      <!-- Tab Bagan (Menu Utama Penonton) -->
+      <section id="bagan" class="tab-content active" role="tabpanel">
+        <div id="bagan-container" class="bracket-view"></div>
+      </section>
+
       <!-- Tab Jadwal -->
-      <section id="jadwal" class="tab-content active" role="tabpanel">
+      <section id="jadwal" class="tab-content" role="tabpanel">
         <div id="jadwal-container" class="card-grid"></div>
       </section>
 
       <!-- Tab Hasil -->
       <section id="hasil" class="tab-content" role="tabpanel">
         <div id="hasil-container" class="card-grid"></div>
-      </section>
-
-      <!-- Tab Bagan -->
-      <section id="bagan" class="tab-content" role="tabpanel">
-        <div id="bagan-container" class="bracket-view"></div>
       </section>
 
       <!-- Tab Panel Admin -->
@@ -70,9 +70,9 @@
             <button class="btn-logout" onclick="logoutAdmin()">Keluar</button>
           </div>
 
-          <!-- Pendaftaran Tim & Pemain -->
+          <!-- Langkah 1: Pendaftaran Tim & Pemain -->
           <div class="admin-card">
-            <h4>1️⃣ Tambah Tim Peserta</h4>
+            <h4>1️⃣ Manajemen Tim & Pemain</h4>
             <div class="input-group">
               <label>Nama Tim:</label>
               <input type="text" id="new-team-name" placeholder="Contoh: Tim Garuda">
@@ -90,11 +90,11 @@
             </div>
           </div>
 
-          <!-- Buat Jadwal Pertandingan Manual -->
+          <!-- Langkah 2: Input Pertandingan ke Bracket -->
           <div class="admin-card" style="margin-top: 20px;">
-            <h4>2️⃣ Buat Jadwal Pertandingan</h4>
+            <h4>2️⃣ Input Pertandingan ke Bagan (Bracket)</h4>
             <div class="input-group">
-              <label>Babak / Nama Laga (Misal: Semifinal, Grup A):</label>
+              <label>Nama Babak (Contoh: Semifinal, Perempat Final, Grup A):</label>
               <input type="text" id="match-round" placeholder="Contoh: Semifinal 1">
             </div>
             <div class="input-group">
@@ -105,11 +105,7 @@
               <label>Pilih Tim 2:</label>
               <select id="match-team2"></select>
             </div>
-            <div class="input-group">
-              <label>Tanggal & Waktu:</label>
-              <input type="text" id="match-date" placeholder="Contoh: Sabtu, 10 Okt - 15:00">
-            </div>
-            <button type="button" class="btn-save" onclick="createNewMatch()" style="width: 100%;">➕ Tambahkan ke Jadwal</button>
+            <button type="button" class="btn-save" onclick="createBracketMatch()" style="width: 100%;">➕ Tambahkan ke Bagan</button>
           </div>
         </div>
       </section>
