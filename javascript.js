@@ -6,7 +6,14 @@ let editingTeamIndex = -1;
 document.addEventListener('DOMContentLoaded', () => {
   renderTeamListAdmin();
   updateTeamSelectOptions();
-  renderPublicUI();
+  
+  // Jika refresh halaman saat status belum login, pastikan paksa di tampilan publik & bersihkan sesi
+  if (!isAdminLoggedIn) {
+    localStorage.setItem('admin_logged_in', 'false');
+    switchView('public');
+  } else {
+    switchView('admin');
+  }
   updateAuthUI();
 });
 
@@ -15,9 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 function updateAuthUI() {
   const btnLogin = document.getElementById('btn-login-trigger');
-  
   if (isAdminLoggedIn) {
-    btnLogin.innerHTML = '🛠️️ Buka Panel Admin';
+    btnLogin.innerHTML = '🛠 Buka Panel Admin';
     btnLogin.classList.add('active-mode');
     btnLogin.onclick = () => switchView('admin');
   } else {
@@ -32,15 +38,19 @@ function switchView(viewName) {
   const adminDash = document.getElementById('admin-dashboard');
 
   if (viewName === 'admin') {
-    if (!isAdminLoggedIn) return openLoginModal();
+    if (!isAdminLoggedIn) {
+      openLoginModal();
+      return;
+    }
+    if (publicDash) {
+      publicDash.classList.remove('active');
+      publicDash.style.display = 'none';
+    }
+    if (adminDash) {
+      adminDash.style.display = 'block';
+      adminDash.classList.add('active');
+    }
     
-    publicDash.classList.remove('active');
-    publicDash.style.display = 'none';
-    
-    adminDash.style.display = 'block';
-    adminDash.classList.add('active');
-    
-    // Pastikan tab pertama di admin langsung aktif dan ter-render
     const defaultTabBtn = document.querySelector('.admin-sidebar .admin-nav-btn');
     if (defaultTabBtn) {
       defaultTabBtn.click();
@@ -48,11 +58,14 @@ function switchView(viewName) {
       renderTeamListAdmin();
     }
   } else {
-    adminDash.classList.remove('active');
-    adminDash.style.display = 'none';
-    
-    publicDash.style.display = 'block';
-    publicDash.classList.add('active');
+    if (adminDash) {
+      adminDash.classList.remove('active');
+      adminDash.style.display = 'none';
+    }
+    if (publicDash) {
+      publicDash.style.display = 'block';
+      publicDash.classList.add('active');
+    }
     renderPublicUI();
   }
 }
@@ -77,11 +90,9 @@ function switchAdminTab(evt, tabName) {
 }
 
 // ==========================================
-// MODAL LOGIN
+// MODAL LOGIN (Auto-Clear Riwayat Ketikan)
 // ==========================================
-// Membuka Modal Login & Membersihkan Ketikan Sebelumnya
 function openLoginModal() { 
-  // Kosongkan riwayat input sebelumnya setiap kali modal dibuka
   const userInput = document.getElementById('admin-user');
   const passInput = document.getElementById('admin-pass');
   if (userInput) userInput.value = '';
@@ -90,7 +101,6 @@ function openLoginModal() {
   document.getElementById('login-modal').style.display = 'flex'; 
 }
 
-// Menutup Modal & Clear Input
 function closeLoginModal() { 
   const userInput = document.getElementById('admin-user');
   const passInput = document.getElementById('admin-pass');
@@ -100,7 +110,6 @@ function closeLoginModal() {
   document.getElementById('login-modal').style.display = 'none'; 
 }
 
-// Proses Login Sukses
 function processLogin() {
   let u = document.getElementById('admin-user').value.trim();
   let p = document.getElementById('admin-pass').value.trim();
@@ -108,23 +117,20 @@ function processLogin() {
   if (u === "admin" && p === "123456") {
     isAdminLoggedIn = true;
     localStorage.setItem('admin_logged_in', 'true');
-    closeLoginModal(); // Otomatis clear input & tutup modal
+    closeLoginModal();
     updateAuthUI();
     switchView('admin');
     showCustomAlert("Otorisasi Berhasil", "Selamat datang di Panel Administrator.", "success");
   } else {
     showCustomAlert("Otorisasi Gagal", "Username atau Password yang dimasukkan salah.", "error");
-    // Fokus kembali ke input password dan bersihkan passwordnya saja
     document.getElementById('admin-pass').value = '';
   }
 }
 
-// Logout & Clear Sesi Admin
 function logoutAdmin() {
   isAdminLoggedIn = false;
   localStorage.setItem('admin_logged_in', 'false');
   
-  // Pastikan form login bersih total saat keluar sesi
   const userInput = document.getElementById('admin-user');
   const passInput = document.getElementById('admin-pass');
   if (userInput) userInput.value = '';
@@ -167,7 +173,6 @@ function addTeam() {
   showCustomAlert("Berhasil", `Tim ${teamName} berhasil didaftarkan.`, "success");
 }
 
-// Edit Tim Modal
 function openEditTeamModal(index) {
   editingTeamIndex = index;
   const team = teamsList[index];
@@ -381,7 +386,7 @@ function saveMatchCard(id) {
   match.rawDate = document.getElementById(`date_${id}`).value;
   match.rawTime = document.getElementById(`time_${id}`).value;
   match.tanggal = formatCustomDate(match.rawDate, match.rawTime);
-  match.status = document.getElementById(`status_${id}`).value;
+  match.status = document.getElementById(`status_${id}` ).value;
   match.skor1 = parseInt(document.getElementById(`skor1_${id}`).value) || 0;
   match.skor2 = parseInt(document.getElementById(`skor2_${id}`).value) || 0;
 
