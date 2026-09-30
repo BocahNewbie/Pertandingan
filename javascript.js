@@ -2,6 +2,8 @@ let teamsList = JSON.parse(localStorage.getItem('turnamen_teams')) || [];
 let matchesList = JSON.parse(localStorage.getItem('turnamen_matches_list')) || [];
 let isAdminLoggedIn = JSON.parse(localStorage.getItem('admin_logged_in')) || false;
 
+let editingTeamIndex = -1; // Penanda index tim yang sedang diedit
+
 document.addEventListener('DOMContentLoaded', () => {
   renderTeamListAdmin();
   updateTeamSelectOptions();
@@ -24,7 +26,7 @@ function formatCustomDate(rawDate, rawTime) {
   return dateStr;
 }
 
-// Tambah Kolom Pemain
+// Tambah Kolom Pemain Saat Buat Tim
 function addPlayerInput() {
   const container = document.getElementById('player-inputs-container');
   if (!container) return;
@@ -32,6 +34,19 @@ function addPlayerInput() {
   row.className = 'player-input-row';
   row.innerHTML = `
     <input type="text" class="player-name-input" placeholder="Nama pemain...">
+    <button type="button" onclick="this.parentElement.remove()">&times;</button>
+  `;
+  container.appendChild(row);
+}
+
+// Tambah Kolom Pemain Saat Edit Tim
+function addPlayerInputEdit() {
+  const container = document.getElementById('edit-player-inputs-container');
+  if (!container) return;
+  const row = document.createElement('div');
+  row.className = 'player-input-row';
+  row.innerHTML = `
+    <input type="text" class="edit-player-name-input" placeholder="Nama pemain...">
     <button type="button" onclick="this.parentElement.remove()">&times;</button>
   `;
   container.appendChild(row);
@@ -68,6 +83,79 @@ function addTeam() {
   showCustomAlert("Berhasil", `Tim "${teamName}" ditambahkan.`, "success");
 }
 
+// Fitur Edit Tim (Buka Modal)
+function openEditTeamModal(index) {
+  editingTeamIndex = index;
+  const team = teamsList[index];
+  
+  document.getElementById('edit-team-name').value = team.name;
+  
+  const container = document.getElementById('edit-player-inputs-container');
+  container.innerHTML = ''; // Bersihkan kontainer pemain sebelumnya
+  
+  team.players.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'player-input-row';
+    row.innerHTML = `
+      <input type="text" class="edit-player-name-input" value="${p}" placeholder="Nama pemain...">
+      <button type="button" onclick="this.parentElement.remove()">&times;</button>
+    `;
+    container.appendChild(row);
+  });
+  
+  document.getElementById('edit-team-modal').style.display = 'flex';
+}
+
+function closeEditTeamModal() {
+  document.getElementById('edit-team-modal').style.display = 'none';
+  editingTeamIndex = -1;
+}
+
+// Fitur Edit Tim (Simpan Data)
+function saveEditTeam() {
+  if (editingTeamIndex === -1) return;
+  
+  const newName = document.getElementById('edit-team-name').value.trim();
+  if (!newName) {
+    showCustomAlert("Perhatian", "Nama tim tidak boleh kosong!", "error");
+    return;
+  }
+  
+  // Cek apakah namanya bentrok dengan tim lain (selain dirinya sendiri)
+  const isDuplicate = teamsList.some((t, i) => i !== editingTeamIndex && t.name.toLowerCase() === newName.toLowerCase());
+  if (isDuplicate) {
+    showCustomAlert("Perhatian", "Nama tim sudah dipakai oleh tim lain!", "error");
+    return;
+  }
+  
+  let newPlayers = [];
+  document.querySelectorAll('.edit-player-name-input').forEach(input => {
+    let p = input.value.trim();
+    if (p) newPlayers.push(p);
+  });
+  
+  const oldName = teamsList[editingTeamIndex].name;
+  
+  // Update Jadwal Jika Nama Tim Berubah
+  if (oldName !== newName) {
+    matchesList.forEach(m => {
+      if (m.tim1 === oldName) m.tim1 = newName;
+      if (m.tim2 === oldName) m.tim2 = newName;
+    });
+    localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
+  }
+  
+  teamsList[editingTeamIndex].name = newName;
+  teamsList[editingTeamIndex].players = newPlayers;
+  localStorage.setItem('turnamen_teams', JSON.stringify(teamsList));
+  
+  closeEditTeamModal();
+  renderTeamListAdmin();
+  updateTeamSelectOptions();
+  renderUI();
+  showCustomAlert("Berhasil", "Data tim dan pemain berhasil diperbarui.", "success");
+}
+
 // Hapus Tim
 function removeTeam(index) {
   let removed = teamsList.splice(index, 1);
@@ -77,6 +165,7 @@ function removeTeam(index) {
   showCustomAlert("Dihapus", `Tim "${removed[0].name}" dihapus.`, "success");
 }
 
+// Render UI Daftar Tim 
 function renderTeamListAdmin() {
   const container = document.getElementById('team-list-admin');
   if (!container) return;
@@ -89,12 +178,15 @@ function renderTeamListAdmin() {
   teamsList.forEach((t, i) => {
     let pStr = t.players.length > 0 ? t.players.join(', ') : 'Tanpa pemain';
     html += `
-      <div class="team-chip">
+      <div class="team-chip" style="min-width: 100%;">
         <div class="team-chip-header">
           <strong>${t.name}</strong>
-          <button type="button" class="btn-danger" onclick="removeTeam(${i})" style="padding:0 6px; font-size:0.8rem;">&times;</button>
+          <div>
+            <button type="button" class="btn-secondary" onclick="openEditTeamModal(${i})" style="padding:4px 8px; font-size:0.8rem; margin-right:4px;">✏️ Edit</button>
+            <button type="button" class="btn-danger" onclick="removeTeam(${i})" style="padding:4px 8px; font-size:0.8rem;">&times;</button>
+          </div>
         </div>
-        <div class="team-players">Pemain: ${pStr}</div>
+        <div class="team-players" style="margin-top: 5px;">Pemain: ${pStr}</div>
       </div>
     `;
   });
@@ -297,7 +389,7 @@ function showCustomAlert(title, msg, type) {
   let overlay = document.getElementById('custom-alert');
   let card = document.getElementById('alert-card-box');
   if (!overlay || !card) {
-    alert(title + "\n" + msg); // Fallback jika HTML alert terhapus
+    alert(title + "\n" + msg);
     return;
   }
   card.className = "custom-alert-card " + type;
@@ -357,7 +449,7 @@ function renderUI() {
                 <input type="number" id="skor2_${m.id}" value="${m.skor2}" min="0" style="flex:1; padding:6px;" placeholder="Skor 2">
               </div>
               <button type="button" class="btn-save" onclick="saveMatchCard('${m.id}')" style="margin-top:8px; width:100%;">💾 Simpan Perubahan</button>
-              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️ Hapus Pertandingan</button>
+              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️️ Hapus Pertandingan</button>
             </div>
           ` : ''}
         </div>
