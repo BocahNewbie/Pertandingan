@@ -9,6 +9,7 @@ let isAdminLoggedIn = JSON.parse(localStorage.getItem('admin_logged_in')) || fal
 
 // Cek status login saat halaman dimuat
 document.addEventListener('DOMContentLoaded', () => {
+  updateFinalTeamsAutomatically();
   renderUI();
   updateAdminUIState();
 });
@@ -39,7 +40,6 @@ function toggleAdminPanel() {
     document.getElementById('admin-pass').value = '';
     document.getElementById('admin-user').focus();
   } else {
-    // Jika sudah login, tombol utama bisa dipakai untuk menutup/membuka panel admin
     const panel = document.getElementById('admin-panel');
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
   }
@@ -50,20 +50,46 @@ function closeLoginModal() {
   document.getElementById('login-modal').style.display = 'none';
 }
 
+// Custom Alert / Notifikasi Popup Bergaya Emoji
+function showCustomAlert(title, message, type) {
+  const alertOverlay = document.getElementById('custom-alert');
+  const alertCard = document.getElementById('alert-card-box');
+  const alertEmoji = document.getElementById('alert-emoji');
+  const alertTitle = document.getElementById('alert-title');
+  const alertMessage = document.getElementById('alert-message');
+
+  alertCard.className = "custom-alert-card " + type;
+  alertTitle.innerText = title;
+  alertMessage.innerText = message;
+
+  if (type === 'success') {
+    alertEmoji.innerText = '🎉';
+  } else if (type === 'error') {
+    alertEmoji.innerText = '❌';
+  } else {
+    alertEmoji.innerText = 'ℹ️';
+  }
+
+  alertOverlay.style.display = 'flex';
+}
+
+function closeCustomAlert() {
+  document.getElementById('custom-alert').style.display = 'none';
+}
+
 // Proses Validasi Username & Password (Default: admin / 123456)
 function processLogin() {
   const user = document.getElementById('admin-user').value.trim();
   const pass = document.getElementById('admin-pass').value.trim();
 
-  // Ubah username & password sesuai keinginan Anda di sini
   if (user === "admin" && pass === "123456") {
     isAdminLoggedIn = true;
     localStorage.setItem('admin_logged_in', 'true');
     closeLoginModal();
     updateAdminUIState();
-    alert("Login Berhasil!");
+    showCustomAlert("Berhasil Masuk!", "Selamat datang kembali, Administrator! Anda sekarang dapat mengelola pertandingan.", "success");
   } else {
-    alert("Username atau Password salah!");
+    showCustomAlert("Gagal Masuk", "Username atau password yang Anda masukkan salah. Silakan coba lagi.", "error");
   }
 }
 
@@ -72,7 +98,7 @@ function logoutAdmin() {
   isAdminLoggedIn = false;
   localStorage.setItem('admin_logged_in', 'false');
   updateAdminUIState();
-  alert("Anda telah keluar dari panel admin.");
+  showCustomAlert("Keluar Sesi", "Anda telah berhasil keluar dari panel kontrol admin.", "success");
 }
 
 // Perbarui Tampilan Tombol & Panel Berdasarkan Status Login
@@ -118,11 +144,40 @@ function onMatchSelectChange() {
   toggleScoreInput();
 }
 
+// Otomatis Menentukan Pemenang dari Semifinal untuk Masuk ke Final
+function updateFinalTeamsAutomatically() {
+  let sf1 = matchesData.SF1;
+  let sf2 = matchesData.SF2;
+  let finalMatch = matchesData.F;
+
+  // Jika Semifinal 1 Selesai, tentukan pemenang (skor tertinggi)
+  if (sf1.status === 'Selesai') {
+    if (sf1.skor1 > sf1.skor2) {
+      finalMatch.tim1 = sf1.tim1;
+    } else if (sf1.skor2 > sf1.skor1) {
+      finalMatch.tim1 = sf1.tim2;
+    } else {
+      finalMatch.tim1 = `Pemenang SF1 (${sf1.tim1} / ${sf1.tim2})`;
+    }
+  }
+
+  // Jika Semifinal 2 Selesai, tentukan pemenang (skor tertinggi)
+  if (sf2.status === 'Selesai') {
+    if (sf2.skor1 > sf2.skor2) {
+      finalMatch.tim2 = sf2.tim1;
+    } else if (sf2.skor2 > sf2.skor1) {
+      finalMatch.tim2 = sf2.tim2;
+    } else {
+      finalMatch.tim2 = `Pemenang SF2 (${sf2.tim1} / ${sf2.tim2})`;
+    }
+  }
+}
+
 // Menyimpan Perubahan Data Admin
 function saveMatchData() {
   const matchId = document.getElementById('match-select').value;
   if (!matchId) {
-    alert("Silakan pilih pertandingan terlebih dahulu!");
+    showCustomAlert("Perhatian", "Silakan pilih pertandingan terlebih dahulu!", "error");
     return;
   }
 
@@ -136,13 +191,19 @@ function saveMatchData() {
     skor2: parseInt(document.getElementById('admin-skor2').value) || 0
   };
 
+  // Jalankan logika otomatisasi untuk babak selanjutnya
+  updateFinalTeamsAutomatically();
+
   localStorage.setItem('turnamen_data', JSON.stringify(matchesData));
-  alert("Data pertandingan berhasil diperbarui!");
+  showCustomAlert("Berhasil Disimpan!", "Data pertandingan dan pemenang fase berikutnya telah diperbarui.", "success");
   renderUI();
 }
 
 // Render UI ke Halaman Pengguna
 function renderUI() {
+  // Pastikan data final selalu disinkronkan saat merender
+  updateFinalTeamsAutomatically();
+
   const jadwalContainer = document.getElementById('jadwal-container');
   const hasilContainer = document.getElementById('hasil-container');
   const baganContainer = document.getElementById('bagan-container');
