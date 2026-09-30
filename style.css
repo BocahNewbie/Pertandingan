@@ -1,64 +1,100 @@
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-body { background: #f1c40f; color: #2c3e50; padding: 20px; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
-.container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+body { background: #f1c40f; color: #2c3e50; padding: 20px; line-height: 1.5; }
 
-.header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f1f1f1; padding-bottom: 15px; }
-.header-area h1 { font-size: 1.4rem; color: #2c3e50; }
+.container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+.view-section { display: none; animation: fadeIn 0.3s ease; }
+.view-section.active { display: block; }
 
-.btn-admin, .btn-save, .btn-submit { background: #2c3e50; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-.btn-secondary { background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
-.btn-danger { background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+/* Headers */
+.header-area, .admin-header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #f1f2f6; padding-bottom: 15px; }
+.header-title h1 { font-size: 1.6rem; color: #2c3e50; margin-bottom: 4px; }
+.header-title p { font-size: 0.9rem; color: #7f8c8d; }
 
-.tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-.tab-btn { flex: 1; padding: 12px; background: #fadbd8; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: #922b21; }
-.tab-btn.active { background: #c0392b; color: white; }
+/* Buttons */
+button { font-family: 'Inter', sans-serif; transition: all 0.2s ease; }
+.btn-admin { background: #2c3e50; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-admin.active-mode { background: #e67e22; }
+.btn-save, .btn-submit { background: #27ae60; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-secondary { background: #3498db; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-danger { background: #e74c3c; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.btn-outline { background: transparent; color: #3498db; border: 2px solid #3498db; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+.btn-cancel { background: #ecf0f1; color: #7f8c8d; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
 
-.admin-tab { background: #f9e79f !important; color: #7d6608 !important; }
-.admin-tab.active { background: #d4ac0d !important; color: white !important; }
+button:hover { filter: brightness(0.9); transform: translateY(-1px); }
+button:active { transform: translateY(0); }
 
-.tab-content { display: none; }
+/* Tabs Publik (Merah) */
+.tabs { display: flex; gap: 10px; margin-bottom: 25px; }
+.tab-btn { flex: 1; padding: 14px; background: #fadbd8; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; color: #c0392b; font-size: 0.95rem; }
+.tab-btn.active { background: #c0392b; color: white; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3); }
+.tab-content { display: none; animation: fadeIn 0.3s ease; }
 .tab-content.active { display: block; }
 
-.player-inputs-container { display: flex; flex-direction: column; gap: 6px; }
-.player-input-row { display: flex; gap: 6px; }
-.player-input-row input { flex: 1; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; }
-.player-input-row button { background: #e74c3c; color: white; border: none; padding: 0 10px; border-radius: 4px; cursor: pointer; }
+/* Layout Dashboard Admin */
+.admin-layout { display: flex; gap: 25px; align-items: flex-start; }
+.admin-sidebar { width: 220px; display: flex; flex-direction: column; gap: 10px; }
+.admin-nav-btn { background: #f8f9fa; border: none; padding: 12px 16px; border-radius: 8px; text-align: left; cursor: pointer; font-weight: 600; color: #34495e; }
+.admin-nav-btn.active { background: #d4ac0d; color: white; box-shadow: 0 4px 15px rgba(212, 172, 13, 0.3); }
+.admin-content { flex: 1; }
+.admin-tab-content { display: none; animation: fadeIn 0.3s ease; }
+.admin-tab-content.active { display: block; }
+.admin-card { background: #fdfefe; border: 1px solid #eee; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+.admin-card h3 { margin-bottom: 20px; color: #2c3e50; font-size: 1.2rem; border-bottom: 2px solid #f1f2f6; padding-bottom: 10px; }
 
-.team-chips-container { display: flex; flex-wrap: wrap; gap: 8px; }
-.team-chip { background: #e8f4fd; border: 1px solid #3498db; color: #2980b9; padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; min-width: 130px; }
-.team-chip-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(52,152,219,0.2); }
-.team-players { font-size: 0.75rem; color: #555; }
+/* Forms & Inputs */
+.form-group, .input-group { margin-bottom: 15px; }
+.input-group label { display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600; color: #34495e; }
+input, select { width: 100%; padding: 10px 14px; border: 1.5px solid #dfe6e9; border-radius: 8px; font-size: 0.95rem; outline: none; transition: border 0.2s; background: #fafafa; }
+input:focus, select:focus { border-color: #3498db; background: #fff; }
 
-.modal-overlay, .custom-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal-card, .custom-alert-card { background: #fffdf0; border: 2px solid #f39c12; padding: 25px; border-radius: 12px; width: 100%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-.custom-alert-card { text-align: center; border-top: 6px solid #f1c40f; }
-.custom-alert-card.success { border-top-color: #27ae60; }
-.custom-alert-card.error { border-top-color: #e74c3c; }
+.player-inputs-container { display: flex; flex-direction: column; gap: 8px; }
+.player-input-row { display: flex; gap: 8px; }
+.player-input-row input { flex: 1; }
+.player-input-row button { background: #e74c3c; color: white; border: none; padding: 0 12px; border-radius: 8px; cursor: pointer; }
 
-.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
-.btn-cancel { background: #e0e0e0; color: #333; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-.btn-alert-ok { background: #2c3e50; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+/* Chips Tim */
+.team-chips-container { display: flex; flex-wrap: wrap; gap: 12px; }
+.team-chip { background: #fff; border: 1px solid #e1e8ed; padding: 12px 15px; border-radius: 10px; flex: 1; min-width: 200px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+.team-chip-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f2f6; padding-bottom: 8px; margin-bottom: 8px; }
+.team-chip-header strong { color: #2c3e50; font-size: 1.05rem; }
+.team-players { font-size: 0.8rem; color: #7f8c8d; line-height: 1.4; }
 
-.admin-panel-wrapper { background: #fdfefe; border: 1px solid #ebedef; padding: 20px; border-radius: 8px; }
-.admin-header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.btn-logout { background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
-
-.form-group, .input-group { margin-bottom: 12px; }
-.form-group label, .input-group label { display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: 600; }
-.form-group select, .input-group input, .input-group select { width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; }
-.skor-group { display: flex; gap: 10px; margin-top: 6px; }
-
-.card-grid { display: flex; flex-direction: column; gap: 12px; }
-.match-card { background: #fff; border: 1px solid #e1e8ed; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-.badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; color: white; text-transform: uppercase; }
+/* Grid Card Match (Publik) */
+.card-grid { display: flex; flex-direction: column; gap: 15px; }
+.match-card { background: #fff; border: 1px solid #ecf0f1; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); position: relative; }
+.badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
 .badge.mendatang { background: #f39c12; }
-.badge.live { background: #e74c3c; }
+.badge.live { background: #e74c3c; animation: pulse 1.5s infinite; }
 .badge.selesai { background: #27ae60; }
-.match-time { font-size: 0.85rem; color: #666; margin: 8px 0; }
-.teams-row { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1.1rem; }
-.vs { font-size: 0.85rem; color: #999; background: #eee; padding: 2px 8px; border-radius: 4px; }
-.score { background: #27ae60; color: white; padding: 4px 12px; border-radius: 6px; }
+.match-time { font-size: 0.85rem; color: #7f8c8d; margin: 12px 0 8px 0; font-weight: 600; }
+.teams-row { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.2rem; color: #2c3e50; }
+.vs { font-size: 0.85rem; color: #95a5a6; background: #f1f2f6; padding: 4px 10px; border-radius: 6px; }
+.score { background: #27ae60; color: white; padding: 6px 16px; border-radius: 8px; font-size: 1.3rem; }
 
-.admin-match-edit-box { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd; background: #fdfefe; }
+/* Match Card Edit Admin */
+.admin-match-edit { border-top: 1px dashed #dfe6e9; margin-top: 15px; padding-top: 15px; background: #fafafa; border-radius: 8px; padding: 15px; }
+.admin-match-edit .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Modal & Popups Modern (Glassmorphism) */
+.modal-overlay, .custom-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 9999; animation: fadeIn 0.2s ease; }
+.modal-card, .custom-alert-card { background: #ffffff; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5); }
+.modal-title { color: #2c3e50; font-size: 1.4rem; margin-bottom: 5px; }
+.modal-subtitle { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 20px; }
+.custom-alert-card { text-align: center; }
+.custom-alert-card.success { border-top: 6px solid #27ae60; }
+.custom-alert-card.error { border-top: 6px solid #e74c3c; }
+.alert-emoji { font-size: 3.5rem; margin-bottom: 15px; }
+.btn-alert-ok { background: #2c3e50; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 1rem; }
+
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .admin-layout { flex-direction: column; }
+  .admin-sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding-bottom: 10px; }
+  .admin-nav-btn { white-space: nowrap; }
+}
