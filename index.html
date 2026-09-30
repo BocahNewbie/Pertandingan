@@ -29,21 +29,25 @@
 
     <main class="content-area">
       <section id="jadwal" class="tab-content active">
-        <div id="jadwal-container" class="card-grid"></div>
+        <div id="jadwal-container" class="card-grid">
+          <p style="text-align: center; color: #7f8c8d; padding: 20px;">⏳ Memuat data jadwal terbaru...</p>
+        </div>
       </section>
       <section id="hasil" class="tab-content">
-        <div id="hasil-container" class="card-grid"></div>
+        <div id="hasil-container" class="card-grid">
+          <p style="text-align: center; color: #7f8c8d; padding: 20px;">⏳ Memuat hasil pertandingan...</p>
+        </div>
       </section>
     </main>
   </div>
 
   <!-- ===============================
-       DASHBOARD ADMIN (Eksklusif)
+       DASHBOARD ADMIN
        =============================== -->
   <div id="admin-dashboard" class="container view-section" style="display: none; max-width: 1000px;">
     <header class="admin-header-area">
       <div class="header-title">
-        <h1>🛠️️ Dashboard Admin</h1>
+        <h1>🛠 Dashboard Admin</h1>
         <p>Pusat Kontrol Manajemen Turnamen</p>
       </div>
       <div class="admin-header-actions">
@@ -52,17 +56,13 @@
     </header>
 
     <div class="admin-layout">
-      <!-- Sidebar Navigasi Admin -->
       <aside class="admin-sidebar">
         <button class="admin-nav-btn active" onclick="switchAdminTab(event, 'admin-tim')">👥 Kelola Tim</button>
         <button class="admin-nav-btn" onclick="switchAdminTab(event, 'admin-bagan')">➕ Susun Bagan</button>
         <button class="admin-nav-btn" onclick="switchAdminTab(event, 'admin-jadwal')">✏️ Update Jadwal</button>
       </aside>
 
-      <!-- Konten Utama Admin -->
       <main class="admin-content">
-        
-        <!-- Tab 1: Kelola Tim -->
         <section id="admin-tim" class="admin-tab-content active">
           <div class="admin-card">
             <h3>Pendaftaran Tim Baru</h3>
@@ -84,7 +84,6 @@
           </div>
         </section>
 
-        <!-- Tab 2: Susun Bagan -->
         <section id="admin-bagan" class="admin-tab-content">
           <div class="admin-card">
             <h3>Susun Pertandingan (Bracket)</h3>
@@ -105,23 +104,19 @@
           </div>
         </section>
 
-        <!-- Tab 3: Update Jadwal & Skor -->
         <section id="admin-jadwal" class="admin-tab-content">
           <div class="admin-card">
             <h3>Manajemen Jadwal & Skor Pertandingan</h3>
             <div id="admin-match-list-container" class="card-grid"></div>
           </div>
         </section>
-
       </main>
     </div>
   </div>
 
   <!-- ===============================
-       MODAL & POPUPS MODERN
+       MODAL & POPUPS
        =============================== -->
-  
-  <!-- Modal Login (Dengan auto-clear & pencegahan autofill) -->
   <div id="login-modal" class="modal-overlay" style="display: none;">
     <div class="modal-card">
       <h3 class="modal-title">🔐 Otorisasi Admin</h3>
@@ -141,7 +136,6 @@
     </div>
   </div>
 
-  <!-- Modal Edit Tim -->
   <div id="edit-team-modal" class="modal-overlay" style="display: none;">
     <div class="modal-card">
       <h3 class="modal-title">✏ Edit Tim</h3>
@@ -162,7 +156,6 @@
     </div>
   </div>
 
-  <!-- Custom Alert -->
   <div id="custom-alert" class="custom-alert-overlay" style="display: none;">
     <div class="custom-alert-card" id="alert-card-box">
       <div id="alert-emoji" class="alert-emoji">✨</div>
