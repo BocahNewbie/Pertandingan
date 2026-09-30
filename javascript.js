@@ -508,7 +508,7 @@ function deleteMatch(id) {
   });
 }
 
-// Render UI Publik: Urutkan otomatis berdasarkan Tanggal DAN Jam terdekat
+// Render UI Publik: Prioritas Utama Tanggal Lebih Dulu, Jika Sama Bandingkan Jam Lebih Dulu
 function renderPublicUI() {
   const jContainer = document.getElementById('jadwal-container');
   const hContainer = document.getElementById('hasil-container');
@@ -517,17 +517,26 @@ function renderPublicUI() {
   let sortedMatches = [...matchesList];
 
   sortedMatches.sort((a, b) => {
-    if (!a.rawDate && b.rawDate) return 1;
-    if (a.rawDate && !b.rawDate) return -1;
-    if (!a.rawDate && !b.rawDate) return 0;
+    let hasDateA = a.rawDate && a.rawDate.trim() !== '';
+    let hasDateB = b.rawDate && b.rawDate.trim() !== '';
 
-    let timeA = a.rawTime ? a.rawTime : '00:00';
-    let timeB = b.rawTime ? b.rawTime : '00:00';
+    if (!hasDateA && hasDateB) return 1;
+    if (hasDateA && !hasDateB) return -1;
+    if (!hasDateA && !hasDateB) return 0;
 
-    let dateA = new Date(`${a.rawDate}T${timeA}`);
-    let dateB = new Date(`${b.rawDate}T${timeB}`);
+    // 1. Bandingkan Tanggal Terlebih Dahulu
+    let dateA = new Date(a.rawDate);
+    let dateB = new Date(b.rawDate);
 
-    return dateA - dateB;
+    if (dateA.getTime() !== dateB.getTime()) {
+      return dateA - dateB; // Tanggal mana yang lebih dulu (maju)
+    }
+
+    // 2. Jika Tanggal Sama Persis, Bandingkan Jam-nya
+    let timeA = a.rawTime && a.rawTime.trim() !== '' ? a.rawTime : '00:00';
+    let timeB = b.rawTime && b.rawTime.trim() !== '' ? b.rawTime : '00:00';
+
+    return timeA.localeCompare(timeB); // Jam mana yang lebih dulu
   });
 
   let jHTML = '', hHTML = '';
