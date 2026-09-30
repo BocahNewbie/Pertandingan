@@ -113,25 +113,29 @@
       </main>
     </div>
   </div>
-
+  
   <!-- ===============================
-       MODAL & POPUPS
+       MODAL LOGIN MODERN
        =============================== -->
   <div id="login-modal" class="modal-overlay" style="display: none;">
     <div class="modal-card">
-      <h3 class="modal-title">🔐 Otorisasi Admin</h3>
-      <p class="modal-subtitle">Silakan masuk menggunakan kredensial Anda.</p>
+      <div class="modal-header-icon">🔐</div>
+      <h3 class="modal-title">Otorisasi Admin</h3>
+      <p class="modal-subtitle">Silakan masukkan kredensial akses untuk mengelola turnamen.</p>
+      
       <div class="input-group">
         <label>Username</label>
         <input type="text" id="admin-user" placeholder="Ketik username..." autocomplete="off">
       </div>
+      
       <div class="input-group">
         <label>Password</label>
         <input type="password" id="admin-pass" placeholder="Ketik password..." autocomplete="new-password">
       </div>
-      <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 20px;">
-        <button type="button" class="btn-cancel" style="flex:1;" onclick="closeLoginModal()">Batal</button>
-        <button type="button" class="btn-submit" style="flex:1;" onclick="processLogin()">Masuk</button>
+      
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-cancel" onclick="closeLoginModal()">Batal</button>
+        <button type="button" class="btn-modal-submit" onclick="processLogin()">Masuk</button>
       </div>
     </div>
   </div>
