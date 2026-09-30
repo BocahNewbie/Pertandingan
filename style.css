@@ -472,3 +472,19 @@ body {
   cursor: pointer;
   font-weight: bold;
 }
+
+/* Styling Credit / Footer */
+.site-footer {
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #9da7b1;
+  border-top: 1px solid #2d333b;
+}
+
+.creator-name {
+  color: #38bdf8; /* Biru cerah khas */
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
