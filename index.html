@@ -17,6 +17,29 @@
       </button>
     </header>
 
+    <!-- Modal Popup Login Modern -->
+    <div id="login-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-card">
+        <h3>🔐 Login Admin</h3>
+        <p>Silakan masukkan kredensial untuk mengakses panel kontrol.</p>
+        
+        <div class="input-group">
+          <label for="admin-user">Username:</label>
+          <input type="text" id="admin-user" placeholder="Masukkan username">
+        </div>
+
+        <div class="input-group">
+          <label for="admin-pass">Password:</label>
+          <input type="password" id="admin-pass" placeholder="Masukkan password">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeLoginModal()">Batal</button>
+          <button type="button" class="btn-submit" onclick="processLogin()">Masuk</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Navigasi Tab -->
     <nav class="tabs" role="tablist" aria-label="Navigasi Turnamen">
       <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="jadwal" onclick="openTab(event, 'jadwal')">
@@ -32,7 +55,10 @@
 
     <!-- Panel Admin -->
     <section id="admin-panel" class="admin-section" style="display: none;" aria-label="Panel Kontrol Admin">
-      <h3>🛠️ Panel Kontrol Admin</h3>
+      <div class="admin-header-panel">
+        <h3>🛠️ Panel Kontrol Admin</h3>
+        <button class="btn-logout" onclick="logoutAdmin()">Keluar (Logout)</button>
+      </div>
       <div class="admin-card">
         <h4>Update Skor / Jadwal Pertandingan</h4>
         
