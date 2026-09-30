@@ -81,19 +81,46 @@ function renderTeamListAdmin() {
   container.innerHTML = html;
 }
 
-// Update Pilihan Dropdown Tim di Panel Admin
+// Mendapatkan daftar tim yang sudah dijadwalkan bertanding
+function getScheduledTeams() {
+  let scheduled = new Set();
+  matchesList.forEach(m => {
+    scheduled.add(m.tim1);
+    scheduled.add(m.tim2);
+  });
+  return scheduled;
+}
+
+// Update Pilihan Dropdown Tim (Mencegah tim yang sudah terjadwal dipilih kembali)
 function updateTeamSelectOptions() {
   const s1 = document.getElementById('match-team1');
   const s2 = document.getElementById('match-team2');
-  let opts = '<option value="">-- Pilih Tim --</option>';
+  
+  let val1 = s1.value;
+  let val2 = s2.value;
+
+  let scheduledTeams = getScheduledTeams();
+
+  let opts1 = '<option value="">-- Pilih Tim 1 --</option>';
+  let opts2 = '<option value="">-- Pilih Tim 2 --</option>';
+
   teamsList.forEach(t => {
-    opts += `<option value="${t.name}">${t.name}</option>`;
+    let isScheduled1 = scheduledTeams.has(t.name) && t.name !== val1;
+    let isScheduled2 = scheduledTeams.has(t.name) && t.name !== val2;
+
+    if (!isScheduled1 || t.name === val1) {
+      opts1 += `<option value="${t.name}" ${t.name === val1 ? 'selected' : ''}>${t.name}</option>`;
+    }
+    if (!isScheduled2 || t.name === val2) {
+      opts2 += `<option value="${t.name}" ${t.name === val2 ? 'selected' : ''}>${t.name}</option>`;
+    }
   });
-  s1.innerHTML = opts;
-  s2.innerHTML = opts;
+
+  s1.innerHTML = opts1;
+  s2.innerHTML = opts2;
 }
 
-// Admin Memasukkan Pertandingan ke Bagan
+// Admin Memasukkan Pertandingan Baru
 function createBracketMatch() {
   let round = document.getElementById('match-round').value.trim();
   let t1 = document.getElementById('match-team1').value;
@@ -126,14 +153,16 @@ function createBracketMatch() {
   document.getElementById('match-team1').value = '';
   document.getElementById('match-team2').value = '';
   
+  updateTeamSelectOptions();
   renderUI();
-  showCustomAlert("Berhasil", "Pertandingan berhasil dimasukkan ke bagan turnamen.", "success");
+  showCustomAlert("Berhasil", "Jadwal pertandingan berhasil ditambahkan.", "success");
 }
 
 // Hapus Pertandingan
 function deleteMatch(id) {
   matchesList = matchesList.filter(m => m.id !== id);
   localStorage.setItem('turnamen_matches_list', JSON.stringify(matchesList));
+  updateTeamSelectOptions();
   renderUI();
 }
 
@@ -221,26 +250,20 @@ function showCustomAlert(title, msg, type) {
 }
 function closeCustomAlert() { document.getElementById('custom-alert').style.display = 'none'; }
 
-// Render UI Bagan, Jadwal, dan Hasil
+// Render UI Jadwal dan Hasil
 function renderUI() {
-  const bContainer = document.getElementById('bagan-container');
   const jContainer = document.getElementById('jadwal-container');
   const hContainer = document.getElementById('hasil-container');
 
   if (matchesList.length === 0) {
-    bContainer.innerHTML = '<p class="empty">Belum ada pertandingan di bagan. Silakan tambahkan melalui Panel Admin.</p>';
     jContainer.innerHTML = '<p class="empty">Belum ada jadwal pertandingan.</p>';
     hContainer.innerHTML = '<p class="empty">Belum ada hasil pertandingan.</p>';
     return;
   }
 
-  let roundsMap = {};
   let jHTML = '', hHTML = '';
 
   matchesList.forEach(m => {
-    if (!roundsMap[m.round]) roundsMap[m.round] = [];
-    roundsMap[m.round].push(m);
-
     // Render Jadwal (Mendatang / Live)
     if (m.status === 'Mendatang' || m.status === 'Live') {
       jHTML += `
@@ -267,7 +290,7 @@ function renderUI() {
                 <input type="number" id="skor2_${m.id}" value="${m.skor2}" min="0" style="flex:1; padding:6px;" placeholder="Skor 2">
               </div>
               <button type="button" class="btn-save" onclick="saveMatchCard('${m.id}')" style="margin-top:8px; width:100%;">💾 Simpan Jadwal & Skor</button>
-              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️ Hapus dari Bagan</button>
+              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️ Hapus Jadwal</button>
             </div>
           ` : ''}
         </div>
@@ -297,7 +320,7 @@ function renderUI() {
               </div>
               <input type="hidden" id="date_${m.id}" value="${m.tanggal}">
               <button type="button" class="btn-save" onclick="saveMatchCard('${m.id}')" style="margin-top:8px; width:100%;">💾 Koreksi Hasil</button>
-              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️ Hapus dari Bagan</button>
+              <button type="button" class="btn-danger" onclick="deleteMatch('${m.id}')" style="margin-top:6px; width:100%;">🗑️ Hapus Jadwal</button>
             </div>
           ` : ''}
         </div>
@@ -307,27 +330,4 @@ function renderUI() {
 
   jContainer.innerHTML = jHTML || '<p class="empty">Tidak ada jadwal aktif.</p>';
   hContainer.innerHTML = hHTML || '<p class="empty">Belum ada hasil pertandingan.</p>';
-
-  // Render Bagan Turnamen Berdasarkan Input Admin
-  let bHTML = '<div class="bracket-wrapper">';
-  for (let r in roundsMap) {
-    bHTML += `<div class="round"><h4>${r}</h4>`;
-    roundsMap[r].forEach(m => {
-      let isF = r.toLowerCase().includes('final') && !r.toLowerCase().includes('semi');
-      let scoreDisplay = m.status === 'Selesai' || m.status === 'Live' ? `(${m.skor1} - ${m.skor2})` : 'vs';
-      bHTML += `
-        <div class="b-match ${isF ? 'final' : ''}">
-          <div class="b-match-teams">
-            <span><strong>${m.tim1}</strong></span>
-            <span style="font-size:0.75rem; color:#888; padding: 0 4px;">${scoreDisplay}</span>
-            <span><strong>${m.tim2}</strong></span>
-          </div>
-          <div class="b-match-status">${m.tanggal} • <span style="font-weight:600; color:${m.status==='Live'?'red':'#555'}">${m.status}</span></div>
-        </div>
-      `;
-    });
-    bHTML += `</div>`;
-  }
-  bHTML += `</div>`;
-  bContainer.innerHTML = bHTML;
 }
