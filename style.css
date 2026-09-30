@@ -2,7 +2,7 @@
 
 body { background: #f1c40f; color: #2c3e50; padding: 20px; }
 
-.container { max-width: 850px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+.container { max-width: 900px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
 
 .header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f1f1f1; padding-bottom: 15px; }
 .header-area h1 { font-size: 1.4rem; color: #2c3e50; }
@@ -62,8 +62,12 @@ body { background: #f1c40f; color: #2c3e50; padding: 20px; }
 .score { background: #27ae60; color: white; padding: 4px 12px; border-radius: 6px; }
 
 .admin-match-edit-box { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd; background: #fdfefe; }
+
+/* Tampilan Bagan */
 .bracket-wrapper { display: flex; justify-content: space-around; gap: 15px; text-align: center; overflow-x: auto; padding-bottom: 10px; }
-.round { flex: 1; min-width: 150px; }
+.round { flex: 1; min-width: 160px; }
 .round h4 { margin-bottom: 10px; color: #2c3e50; font-size: 0.95rem; background: #eaeded; padding: 6px; border-radius: 4px; }
-.b-match { background: #f8f9fa; border: 1px solid #ccc; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; }
+.b-match { background: #f8f9fa; border: 1px solid #ccc; padding: 12px; border-radius: 6px; margin-bottom: 10px; font-size: 0.85rem; font-weight: 600; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 .b-match.final { background: #fcf3cf; border-color: #f1c40f; }
+.b-match-teams { display: flex; justify-content: space-between; align-items: center; }
+.b-match-status { font-size: 0.7rem; color: #777; border-top: 1px solid #eee; padding-top: 2px; }
