@@ -57,6 +57,7 @@
             <button class="btn-logout" onclick="logoutAdmin()">Keluar</button>
           </div>
 
+          <!-- Langkah 1 -->
           <div class="admin-card">
             <h4>1️⃣ Manajemen Tim & Pemain</h4>
             <div class="input-group">
@@ -76,10 +77,11 @@
             </div>
           </div>
 
+          <!-- Langkah 2 (Tanpa Tanggal) -->
           <div class="admin-card" style="margin-top: 20px;">
-            <h4>2️⃣ Buat Jadwal Pertemuan Tim</h4>
+            <h4>2️⃣ Susun Pertandingan (Bracket)</h4>
             <div class="input-group">
-              <label>Nama Babak / Laga (Contoh: Semifinal 1, Perempat Final):</label>
+              <label>Nama Babak / Laga (Contoh: Semifinal 1, Grup A):</label>
               <input type="text" id="match-round" placeholder="Contoh: Semifinal 1">
             </div>
             <div class="input-group">
@@ -90,18 +92,8 @@
               <label>Pilih Tim 2:</label>
               <select id="match-team2" onchange="updateTeamSelectOptions()"></select>
             </div>
-            <!-- Kalender & Jam Dipisah -->
-            <div class="input-group" style="display: flex; gap: 10px;">
-              <div style="flex: 1;">
-                <label>Tanggal (Kalender):</label>
-                <input type="date" id="match-date" style="width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px;">
-              </div>
-              <div style="flex: 1;">
-                <label>Jam:</label>
-                <input type="time" id="match-time" style="width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px;">
-              </div>
-            </div>
-            <button type="button" class="btn-save" onclick="createBracketMatch()" style="width: 100%; margin-top: 10px;">➕ Tambahkan ke Jadwal</button>
+            
+            <button type="button" class="btn-save" onclick="createBracketMatch()" style="width: 100%; margin-top: 10px;">➕ Tambahkan Pertandingan</button>
           </div>
         </div>
       </section>
